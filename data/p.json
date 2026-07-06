@@ -1,0 +1,81 @@
+{
+  "consonante": "P",
+  "titulo": "Sílabas con P",
+  "silabas": [
+    {
+      "silaba": "PA",
+      "palabras": [
+        ["PA","PÁ"],
+        ["PA","TO"],
+        ["PA","LA"],
+        ["PA","LO"],
+        ["PA","N"],
+        ["PA","PEL"],
+        ["PA","LE","TA"],
+        ["PA","YA","SO"],
+        ["PA","NE","LA"],
+        ["PA","SA","JE"]
+      ]
+    },
+    {
+      "silaba": "PE",
+      "palabras": [
+        ["PE","LO"],
+        ["PE","LO","TA"],
+        ["PE","RA"],
+        ["PE","RRO"],
+        ["PE","Z"],
+        ["PE","CHO"],
+        ["PE","INE"],
+        ["PE","PIN","O"],
+        ["PE","DA","ZO"],
+        ["PE","LU","CHE"]
+      ]
+    },
+    {
+      "silaba": "PI",
+      "palabras": [
+        ["PI","NO"],
+        ["PI","ZA","RRA"],
+        ["PI","SO"],
+        ["PI","LO","TO"],
+        ["PI","RA","TA"],
+        ["PI","ÑA"],
+        ["PI","NO","QUI","O"],
+        ["PI","MIEN","TO"],
+        ["PI","NO","CEL"],
+        ["PI","AN","O"]
+      ]
+    },
+    {
+      "silaba": "PO",
+      "palabras": [
+        ["PO","LO"],
+        ["PO","CO"],
+        ["PO","ZO"],
+        ["PO","LLO"],
+        ["PO","MA","DA"],
+        ["PO","LI","CÍ","A"],
+        ["PO","LI","TO"],
+        ["PO","TA","JE"],
+        ["PO","LEN"],
+        ["PO","TA","TO"]
+      ]
+    },
+    {
+      "silaba": "PU",
+      "palabras": [
+        ["PU","ÑO"],
+        ["PU","ER","TA"],
+        ["PU","EN","TE"],
+        ["PU","MA"],
+        ["PU","ÑO","TA"],
+        ["PU","LGA"],
+        ["PU","DI","N"],
+        ["PU","PI","TRE"],
+        ["PU","LPO"],
+        ["PU","ÑO"]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "consonante": "M",
+  "titulo": "Sílabas con M",
+  "silabas": [
+    {
+      "silaba": "MA",
+      "palabras": [
+        ["MA","MÁ"],
+        ["MA","NO"],
+        ["MA","PA"],
+        ["MA","LE","TA"],
+        ["MA","DE","RA"],
+        ["MA","RI","PO","SA"],
+        ["MA","NE","JA"],
+        ["MA","NE","RA"],
+        ["MA","TE"],
+        ["MA","NI","ZA"]
+      ]
+    },
+    {
+      "silaba": "ME",
+      "palabras": [
+        ["ME","SA"],
+        ["ME","LÓN"],
+        ["ME","DIA"],
+        ["ME","DI","DA"],
+        ["ME","CHA"],
+        ["ME","DI","CI","NA"],
+        ["CO","ME","TA"],
+        ["ME","CA","NI","CO"],
+        ["ME","JOR"],
+        ["ME","REN","DA"]
+      ]
+    },
+    {
+      "silaba": "MI",
+      "palabras": [
+        ["MI","EL"],
+        ["MI","TO"],
+        ["MI","NO"],
+        ["MI","NU","TO"],
+        ["MI","RA"],
+        ["MI","RAR"],
+        ["MI","TA","D"],
+        ["MI","SA"],
+        ["MI","SI","ÓN"],
+        ["MI","CRO","FO","NO"]
+      ]
+    },
+    {
+      "silaba": "MO",
+      "palabras": [
+        ["MO","NO"],
+        ["MO","CHI","LA"],
+        ["MO","NE","DA"],
+        ["MO","TOR"],
+        ["MO","SAI","CO"],
+        ["MO","VI","MIEN","TO"],
+        ["MO","RA"],
+        ["MO","LI","NO"],
+        ["MO","DE","LO"],
+        ["MO","MEN","TO"]
+      ]
+    },
+    {
+      "silaba": "MU",
+      "palabras": [
+        ["MU","SI","CA"],
+        ["MU","ÑE","CA"],
+        ["MU","RO"],
+        ["MU","LE","TA"],
+        ["MU","CHA","CHO"],
+        ["MU","CHO"],
+        ["MU","LA"],
+        ["MU","SE","O"],
+        ["MU","RA","CIÉ","LA","GO"],
+        ["MU","NE","CO"]
+      ]
+    }
+  ]
+}

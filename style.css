@@ -1,0 +1,408 @@
+/* ==========================================================================
+   CONFIGURACIÓN GENERAL Y VARIABLES (Paleta de colores infantil/moderna)
+   ========================================================================== */
+:root {
+    --bg-main: #FFDE4D;
+    --bg-app: #FFF9E6;
+    --color-primary: #FF6B6B;
+    --color-secondary: #4DBCFF;
+    --color-success: #6BCB77;
+    --color-warning: #FFA62F;
+    --text-dark: #2C3E50;
+    --radius-large: 24px;
+    --radius-round: 50%;
+    --font-game: 'Fredoka One', 'Comic Sans MS', system-ui, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-main);
+    font-family: var(--font-game);
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    padding: 10px;
+}
+
+/* Contenedor Responsivo Estilo Tablet/Consola */
+#app-container {
+    width: 100%;
+    max-width: 900px;
+    height: 95vh;
+    max-height: 600px;
+    background-color: var(--bg-app);
+    border-radius: var(--radius-large);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+    border: 8px solid #FFF;
+}
+
+/* Pantallas del Juego */
+.game-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.game-screen.active {
+    display: flex;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ==========================================================================
+   INTERFAZ DE MENÚ PRINCIPAL
+   ========================================================================== */
+.game-title {
+    font-size: 4rem;
+    color: var(--color-primary);
+    text-shadow: 4px 4px 0px #FFF, 7px 7px 0px rgba(0,0,0,0.05);
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.game-subtitle {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Botones Grandes UI Infantil */
+.btn {
+    font-family: var(--font-game);
+    font-size: 1.6rem;
+    padding: 15px 30px;
+    border: none;
+    border-radius: var(--radius-large);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    box-shadow: 0 8px 0px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: white;
+    font-weight: bold;
+}
+
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+}
+
+.btn-mode:nth-child(1) { background-color: var(--color-primary); }
+.btn-mode:nth-child(2) { background-color: var(--color-secondary); }
+.btn-mode:nth-child(3) { background-color: var(--color-warning); }
+
+.btn-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-round);
+    border: 4px solid #FFF;
+    background-color: #FFF;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+}
+
+.btn-circle:active { transform: scale(0.9); }
+
+.footer-controls {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+}
+
+/* ==========================================================================
+   ZONA DE JUEGO PRINCIPAL
+   ========================================================================== */
+.game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.target-container {
+    background: #FFF;
+    padding: 8px 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.target-label {
+    font-size: 1.2rem;
+    color: #7F8C8D;
+}
+
+.target-syllable {
+    font-size: 2.2rem;
+    color: var(--color-primary);
+    font-weight: 900;
+}
+
+.stars-counter {
+    font-size: 1.6rem;
+    background: #FFF;
+    padding: 8px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+}
+
+.playground {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* --- ESTILOS DE LOS MODOS DE JUEGO --- */
+
+/* Modo 1: Palabra Silábica Abierta */
+.word-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.syllable-bubble {
+    background: white;
+    padding: 20px 35px;
+    font-size: 2.5rem;
+    border-radius: var(--radius-large);
+    border: 4px solid #E0E0E0;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #E0E0E0;
+    transition: all 0.1s ease;
+}
+
+/* Modo 2: Selección de Tres Bloques de Palabras */
+.words-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.word-card {
+    background: white;
+    padding: 18px;
+    font-size: 2rem;
+    text-align: center;
+    border-radius: var(--radius-large);
+    border: 4px solid #E0E0E0;
+    box-shadow: 0 8px 0 #E0E0E0;
+    cursor: pointer;
+}
+
+/* Modo 3: Atrapa la Sílaba Flotante */
+.floating-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.floating-syllable {
+    position: absolute;
+    background: #FFF;
+    padding: 15px 25px;
+    font-size: 2rem;
+    border-radius: 50px;
+    border: 4px solid var(--color-secondary);
+    box-shadow: 0 6px 0 var(--color-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Estados de feedback interactivo visual */
+.hit-success {
+    background-color: var(--color-success) !important;
+    color: white !important;
+    border-color: #55B061 !important;
+    box-shadow: 0 4px 0 #449050 !important;
+    transform: scale(1.08) translateY(4px);
+    animation: bounce 0.4s ease;
+}
+
+.hit-fail {
+    background-color: #FF8A8A !important;
+    color: white !important;
+    border-color: #E06C6C !important;
+    box-shadow: 0 4px 0 #C25353 !important;
+    animation: shake 0.3s ease;
+}
+
+.feedback-message {
+    height: 30px;
+    font-size: 1.4rem;
+    color: var(--color-success);
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   VENTANAS MODALES (UI PADRES Y CRÉDITOS)
+   ========================================================================== */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 460px;
+    padding: 30px;
+    border-radius: var(--radius-large);
+    border: 6px solid var(--color-secondary);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.modal-content h2 {
+    color: var(--color-secondary);
+    margin-bottom: 15px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    font-size: 1.2rem;
+}
+
+/* Inputs de Checkbox Grandes tipo Switch */
+.setting-item input[type="checkbox"] {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.btn-small {
+    background: var(--text-dark);
+    font-size: 1rem;
+    padding: 8px 15px;
+}
+
+.btn-danger { background: #E74C3C; font-size: 1.1rem; padding: 10px; width: 100%; }
+.btn-close { background: #7F8C8D; margin-top: 15px; font-size: 1.2rem; width: 100%; }
+
+/* Créditos específicos */
+.credits-content .version { color: #95A5A6; font-size: 0.9rem; margin-bottom: 10px; }
+.credits-content .studio { font-size: 1.3rem; margin-bottom: 15px; color: var(--text-dark); }
+.credits-content .dev-info { background: #F8F9FA; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+
+.btn-whatsapp {
+    display: inline-block;
+    margin-top: 8px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 0 #1EBE56;
+}
+
+.credits-content .message {
+    font-style: italic;
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.4;
+    background: #FFFCEB;
+    padding: 12px;
+    border-left: 5px solid var(--bg-main);
+    border-radius: 4px;
+}
+
+/* Canvas del Confeti */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* ==========================================================================
+   ANIMACIONES NATIVAS CSS
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1.08) translateY(4px); }
+    50% { transform: scale(1.2) translateY(-8px); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+/* Adaptabilidad Móvil */
+@media (max-width: 600px) {
+    .game-title { font-size: 2.8rem; }
+    .syllable-bubble { font-size: 1.8rem; padding: 15px 25px; }
+    .word-card { font-size: 1.5rem; }
+}

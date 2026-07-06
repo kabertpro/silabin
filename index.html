@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Silabín – Encuentra la Sílaba</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <section id="screen-menu" class="game-screen active">
+            <h1 class="game-title">Silabín</h1>
+            <p class="game-subtitle">Encuentra la Sílaba</p>
+            
+            <div class="menu-buttons">
+                <button class="btn btn-mode" onclick="game.startMode(1)">
+                    <span class="btn-icon">🔍</span> Encuentra la Sílaba
+                </button>
+                <button class="btn btn-mode" onclick="game.startMode(2)">
+                    <span class="btn-icon">❓</span> ¿Dónde está?
+                </button>
+                <button class="btn btn-mode" onclick="game.startMode(3)">
+                    <span class="btn-icon">🎈</span> Atrapa la Sílaba
+                </button>
+            </div>
+
+            <div class="footer-controls">
+                <button class="btn-circle" id="btn-parents" title="Configuración para Padres">⚙️</button>
+                <button class="btn-circle" id="btn-credits" title="Créditos">ⓘ</button>
+            </div>
+        </section>
+
+        <section id="screen-game" class="game-screen">
+            <div class="game-header">
+                <button class="btn-circle back-home" onclick="game.backToMenu()">🏠</button>
+                <div class="target-container">
+                    <span class="target-label">Busca:</span>
+                    <span id="target-syllable" class="target-syllable">-</span>
+                </div>
+                <div class="stars-counter">⭐ <span id="star-count">0</span></div>
+            </div>
+
+            <div id="game-playground" class="playground"></div>
+            
+            <div id="feedback-message" class="feedback-message"></div>
+        </section>
+
+        <div id="modal-parents" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Ajustes para Padres</h2>
+                <hr>
+                <div class="setting-item">
+                    <label for="setting-audio">🔊 Efectos de Sonido</label>
+                    <input type="checkbox" id="setting-audio" checked>
+                </div>
+                <div class="setting-item">
+                    <label for="setting-narration">🗣️ Narración / Voces</label>
+                    <input type="checkbox" id="setting-narration" checked>
+                </div>
+                <div class="setting-item">
+                    <label for="setting-fullscreen">📺 Pantalla Completa</label>
+                    <button id="btn-fullscreen" class="btn-small">Activar</button>
+                </div>
+                <div class="setting-item">
+                    <button id="btn-reset" class="btn btn-danger">Reiniciar Progreso</button>
+                </div>
+                <button class="btn btn-close modal-close">Cerrar</button>
+            </div>
+        </div>
+
+        <div id="modal-credits" class="modal-overlay">
+            <div class="modal-content credits-content">
+                <h2>Silabín – Encuentra la Sílaba</h2>
+                <p class="version">Versión 1.0</p>
+                <p class="studio"><strong>Kabert Studio</strong> <br>by LMKE</p>
+                
+                <div class="dev-info">
+                    <p><strong>Desarrollador:</strong><br>Luis Miguel Kapa Escobar</p>
+                    <a href="https://wa.me/59165665429" target="_blank" class="btn-whatsapp">
+                        💚 Contactar por WhatsApp
+                    </a>
+                </div>
+                
+                <blockquote class="message">
+                    "Gracias por apoyar la educación infantil. Creemos que aprender jugando desarrolla la curiosidad, la creatividad y el amor por la lectura."
+                </blockquote>
+                
+                <button class="btn btn-close modal-close">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>

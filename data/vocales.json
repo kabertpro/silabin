@@ -1,0 +1,107 @@
+{
+  "consonante": "Vocales",
+  "titulo": "Las Vocales",
+  "silabas": [
+    {
+      "silaba": "A",
+      "palabras": [
+        ["A","BE","JA"],
+        ["A","BUE","LA"],
+        ["A","BUE","LO"],
+        ["A","CEI","TU","NA"],
+        ["A","CUA","RIO"],
+        ["A","GUA"],
+        ["A","GUA","CA","TE"],
+        ["A","GUI","LA"],
+        ["A","LA"],
+        ["AL","MO","HA","DA"],
+        ["ÁN","GEL"],
+        ["A","NI","LLO"],
+        ["A","RA","ÑA"],
+        ["ÁR","BOL"],
+        ["AR","CO"],
+        ["AR","CO","Í","RIS"],
+        ["AR","MA","RIO"],
+        ["AR","ROZ"],
+        ["AU","TO"],
+        ["A","VIÓN"]
+      ]
+    },
+    {
+      "silaba": "E",
+      "palabras": [
+        ["E","DAD"],
+        ["E","DI","FI","CIO"],
+        ["E","LE","FAN","TE"],
+        ["E","LO","TE"],
+        ["EM","PA","NA","DA"],
+        ["EN","CHU","FE"],
+        ["EN","SA","LA","DA"],
+        ["EN","TRA","DA"],
+        ["E","QUI","PO"],
+        ["E","RI","ZO"],
+        ["ES","CA","LE","RA"],
+        ["ES","CO","BA"],
+        ["ES","CUE","LA"],
+        ["ES","PE","JO"],
+        ["ES","TRE","LLA"],
+        ["ES","TU","CHE"],
+        ["E","TI","QUE","TA"]
+      ]
+    },
+    {
+      "silaba": "I",
+      "palabras": [
+        ["I","CO","NO"],
+        ["I","GLE","SIA"],
+        ["I","GLÚ"],
+        ["I","GUA","NA"],
+        ["I","MÁN"],
+        ["IM","PER","ME","A","BLE"],
+        ["IM","PRE","SO","RA"],
+        ["IN","CEN","DIO"],
+        ["IN","SEC","TO"],
+        ["INS","TRU","MEN","TO"],
+        ["IN","TER","RUP","TOR"],
+        ["IN","VIER","NO"],
+        ["IN","YEC","CIÓN"],
+        ["IS","LA"]
+      ]
+    },
+    {
+      "silaba": "O",
+      "palabras": [
+        ["O","A","SIS"],
+        ["O","CA","RI","NA"],
+        ["O","CHO"],
+        ["O","FI","CI","NA"],
+        ["O","JO"],
+        ["O","LA"],
+        ["O","LLA"],
+        ["O","LI","VA"],
+        ["OR","CA"],
+        ["O","RE","JA"],
+        ["O","RAN","GU","TÁN"],
+        ["O","RU","GA"],
+        ["OS","TRA"],
+        ["O","SO"],
+        ["O","SI","TO"],
+        ["O","VE","JA"],
+        ["O","VI","LLO"]
+      ]
+    },
+    {
+      "silaba": "U",
+      "palabras": [
+        ["U","KE","LE","LE"],
+        ["U","NI","COR","NIO"],
+        ["U","NI","FOR","ME"],
+        ["U","NO"],
+        ["U","ÑA"],
+        ["UR","NA"],
+        ["U","RRA","CA"],
+        ["U","VA"]
+      ]
+    }
+  ]
+}
