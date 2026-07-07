@@ -2,11 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FFDE4D">
+    <meta name="screen-orientation" content="portrait">
     <title>Silabín – Encuentra la Sílaba</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="rotate-overlay" class="rotate-overlay">
+        <div class="rotate-content">
+            <div class="rotate-icon">📱</div>
+            <p>Gira tu dispositivo a modo vertical para jugar</p>
+        </div>
+    </div>
 
     <div id="screen-splash" class="splash-overlay active">
         <div class="splash-center">
@@ -43,18 +55,25 @@
                 <span>👋 ¡Hola, <strong id="display-player-name">-</strong>!</span>
                 <span class="top-record">🏆 Récord: <strong id="display-player-record">0</strong></span>
             </div>
-            <h1 class="game-title">Silabín</h1>
-            
-            <div class="menu-buttons">
-                <button class="btn btn-mode" onclick="game.selectMode(1)">
-                    <span class="btn-icon">🔍</span> Encuentra la Sílaba
-                </button>
-                <button class="btn btn-mode" onclick="game.selectMode(2)">
-                    <span class="btn-icon">❓</span> ¿Dónde está?
-                </button>
-                <button class="btn btn-mode" onclick="game.selectMode(3)">
-                    <span class="btn-icon">🎈</span> Atrapa la Sílaba
-                </button>
+
+            <div class="menu-hero">
+                <div class="menu-hero-visual">
+                    <div class="menu-mascot">🎈</div>
+                    <h1 class="game-title">Silabín</h1>
+                    <p class="menu-tagline">Elige un juego y aprende jugando</p>
+                </div>
+
+                <div class="menu-buttons">
+                    <button class="btn btn-mode" onclick="game.selectMode(1)">
+                        <span class="btn-icon">🔍</span> Encuentra la Sílaba
+                    </button>
+                    <button class="btn btn-mode" onclick="game.selectMode(2)">
+                        <span class="btn-icon">❓</span> ¿Dónde está?
+                    </button>
+                    <button class="btn btn-mode" onclick="game.selectMode(3)">
+                        <span class="btn-icon">🎈</span> Atrapa la Sílaba
+                    </button>
+                </div>
             </div>
 
             <div class="footer-controls">

@@ -104,6 +104,7 @@ class SilabinEngine {
     registerEvents() {
         document.getElementById('btn-splash-start').addEventListener('click', () => {
             this.playSystemSound('click');
+            this.requestFullscreenAndLockPortrait();
             this.screens.splash.classList.remove('active');
             this.loadProfileFromDevice();
             if (!this.playerName) {
@@ -479,6 +480,24 @@ class SilabinEngine {
     toggleFullscreen() {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen().then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar").catch(() => {});
         else { document.exitFullscreen(); document.getElementById('btn-fullscreen').innerText = "Activar"; }
+    }
+
+    // En celulares y tablets forzamos pantalla completa + orientación vertical.
+    // En escritorio (puntero fino) no se activa, para respetar la ventana del usuario.
+    isTouchDevice() {
+        return window.matchMedia('(pointer: coarse)').matches;
+    }
+
+    requestFullscreenAndLockPortrait() {
+        if (!this.isTouchDevice()) return;
+        const el = document.documentElement;
+        const goFullscreen = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        if (goFullscreen && !document.fullscreenElement) {
+            goFullscreen.call(el).catch(() => {});
+        }
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait').catch(() => {});
+        }
     }
 
     resetEverything() { localStorage.clear(); alert("Reiniciado."); window.location.reload(); }
