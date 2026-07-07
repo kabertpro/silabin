@@ -1,55 +1,88 @@
 /**
  * PROYECTO: SILABÍN – ENCUENTRA LA SÍLABA
  * Desarrollador: Kabert Studio - by LMKE (Luis Miguel Kapa Escobar)
- * Arquitectura: Motor de generación dinámica de retos basados en Diccionario Silábico.
+ * Arquitectura: Conectores de Diccionario Modular y Sistema de Progreso por Pasos.
  */
 
 class SilabinEngine {
     constructor() {
-        // Estado del juego
+        // Variables del Jugador y Récords
+        this.playerName = "";
+        this.playerRecord = 0;
+        this.stars = 0;
+
+        // Estructura de Control de Niveles Finitos (5 retos por juego)
         this.currentMode = null;
-        this.stars = parseInt(localStorage.getItem('silabin_stars')) || 0;
-        this.animationFrameIds = [];
-        
-        // Base de datos cargada dinámicamente
-        this.availableWorlds = []; // Viene de index.json
-        this.loadedDictionary = []; // Palabras estructuradas del mundo actual
+        this.currentRound = 0;
+        this.maxRoundsPerLevel = 5;
 
-        // Reto actual en pantalla
+        // Base de datos cargada
+        this.availableWorlds = [];
+        this.loadedDictionary = [];
         this.currentChallenge = null;
-        this.lastWordId = null; // Evita repetición inmediata
+        this.lastWordId = null;
+        this.animationFrameIds = [];
 
-        // Configuración
+        // Parámetros del Panel
         this.settings = {
             audio: JSON.parse(localStorage.getItem('silabin_audio')) !== false,
             narration: JSON.parse(localStorage.getItem('silabin_narration')) !== false
         };
 
-        this.successTexts = ["¡Muy bien!", "¡Excelente!", "¡Lo lograste!", "¡Fantástico!"];
+        this.successTexts = ["¡Muy bien!", "¡Excelente!", "¡Lo lograste!", "¡Fantástico!", "¡Muy bien hecho!"];
         this.failTexts = ["¡Casi!", "Inténtalo otra vez", "Tómate tu tiempo", "Tú puedes"];
 
         this.initDOM();
         this.registerEvents();
-        this.updateStarDisplay();
+        this.loadProfileFromDevice();
     }
 
     initDOM() {
         this.screens = {
+            splash: document.getElementById('screen-splash'),
+            profile: document.getElementById('screen-profile'),
             menu: document.getElementById('screen-menu'),
-            game: document.getElementById('screen-game')
+            worlds: document.getElementById('screen-worlds'),
+            game: document.getElementById('screen-game'),
+            victory: document.getElementById('screen-victory')
         };
+
         this.playground = document.getElementById('game-playground');
         this.targetSyllableElement = document.getElementById('target-syllable');
         this.starCountElement = document.getElementById('star-count');
+        this.progressBarFill = document.getElementById('progress-bar-fill');
         this.feedbackElement = document.getElementById('feedback-message');
         this.modalParents = document.getElementById('modal-parents');
         this.modalCredits = document.getElementById('modal-credits');
+
+        // Textos del Menú
+        this.displayPlayerName = document.getElementById('display-player-name');
+        this.displayPlayerRecord = document.getElementById('display-player-record');
         
         document.getElementById('setting-audio').checked = this.settings.audio;
         document.getElementById('setting-narration').checked = this.settings.narration;
     }
 
     registerEvents() {
+        // Pantalla Splash
+        document.getElementById('btn-splash-start').addEventListener('click', () => {
+            this.playSystemSound('click');
+            this.playAudioFile('hola.mp3');
+            if (!this.playerName) {
+                this.changeScreen('profile');
+            } else {
+                this.changeScreen('menu');
+            }
+        });
+
+        // Pantalla de Nombre
+        document.getElementById('btn-save-profile').addEventListener('click', () => this.saveProfile());
+        document.getElementById('btn-change-user').addEventListener('click', () => {
+            this.playSystemSound('click');
+            this.changeScreen('profile');
+        });
+
+        // Modales Básicos
         document.getElementById('btn-parents').addEventListener('click', () => this.toggleModal(this.modalParents, true));
         document.getElementById('btn-credits').addEventListener('click', () => this.toggleModal(this.modalCredits, true));
         
@@ -70,180 +103,198 @@ class SilabinEngine {
         });
 
         document.getElementById('btn-fullscreen').addEventListener('click', () => this.toggleFullscreen());
-        document.getElementById('btn-reset').addEventListener('click', () => this.resetProgress());
+        document.getElementById('btn-reset').addEventListener('click', () => this.resetEverything());
     }
 
     /* ==========================================================================
-       CARGA ASÍNCRONA DE LA BASE DE DATOS DICCIONARIO
+       SISTEMA DE PERFILES DE JUGADORES
        ========================================================================== */
-    async startMode(modeNumber) {
-        this.playSystemSound('click');
-        this.currentMode = modeNumber;
-        this.clearActiveTimers();
-
-        try {
-            // 1. Leer el índice general para saber qué mundos existen
-            const indexResponse = await fetch('data/index.json');
-            if (!indexResponse.ok) throw new Error("No se pudo cargar index.json");
-            const indexData = await indexResponse.json();
-            this.availableWorlds = indexData.worlds;
-
-            // 2. Elegir un mundo/consonante de forma aleatoria para esta partida
-            const randomWorld = this.availableWorlds[Math.floor(Math.random() * this.availableWorlds.length)];
+    loadProfileFromDevice() {
+        const activeUser = localStorage.getItem('silabin_current_user');
+        if (activeUser) {
+            this.playerName = activeUser;
+            this.playerRecord = parseInt(localStorage.getItem(`silabin_record_${activeUser}`)) || 0;
+            this.stars = parseInt(localStorage.getItem(`silabin_stars_${activeUser}`)) || 0;
             
-            // 3. Cargar el JSON específico de ese mundo (ej: d.json o vocales.json)
-            const worldResponse = await fetch(`data/${randomWorld}.json`);
-            if (!worldResponse.ok) throw new Error(`No se pudo cargar data/${randomWorld}.json`);
-            const worldData = await worldResponse.json();
-
-            // 4. Aplanar el diccionario para trabajar cómodamente a nivel de retos
-            this.buildWorkingDictionary(worldData);
-
-            // Cambiar de pantalla
-            this.screens.menu.classList.remove('active');
-            this.screens.game.classList.add('active');
-
-            this.playModeIntroAudio(modeNumber);
-            this.generateChallenge();
-
-        } catch (error) {
-            console.error("Error cargando el diccionario silábico:", error);
-            alert("Error al cargar la base de datos de consonantes. Verifica que index.json y tus archivos de letras existan en la carpeta /data.");
+            this.displayPlayerName.innerText = this.playerName;
+            this.displayPlayerRecord.innerText = this.playerRecord;
+            this.starCountElement.innerText = this.stars;
         }
     }
 
-    // Convierte el JSON jerárquico en una lista plana de combinaciones lista para consumir
+    saveProfile() {
+        const input = document.getElementById('player-input').value.trim();
+        if (!input) return alert("Por favor escribe tu nombre");
+
+        this.playSystemSound('click');
+        this.playerName = input;
+        localStorage.setItem('silabin_current_user', input);
+
+        // Si es un perfil totalmente nuevo, inicializamos su registro histórico en 0
+        if (!localStorage.getItem(`silabin_record_${input}`)) {
+            localStorage.setItem(`silabin_record_${input}`, 0);
+            localStorage.setItem(`silabin_stars_${input}`, 0);
+        }
+
+        this.loadProfileFromDevice();
+        document.getElementById('player-input').value = ""; // Limpiar input
+        this.playAudioFile('bienvenido_a_silabin.mp3');
+        this.changeScreen('menu');
+    }
+
+    /* ==========================================================================
+       SELECTOR DE MUNDOS / CONSONANTES (NO ALEATORIO)
+       ========================================================================== */
+    async selectMode(modeNumber) {
+        this.playSystemSound('click');
+        this.currentMode = modeNumber;
+        
+        try {
+            // Leer index.json para renderizar los botones disponibles
+            const response = await fetch('data/index.json');
+            if (!response.ok) throw new Error("Falta index.json");
+            const data = await response.json();
+            this.availableWorlds = data.worlds;
+
+            // Renderizado interactivo del Grid de Letras
+            const container = document.getElementById('worlds-grid-container');
+            container.innerHTML = "";
+
+            this.availableWorlds.forEach(worldKey => {
+                const button = document.createElement('button');
+                button.className = 'btn-world';
+                button.innerText = worldKey.toUpperCase();
+                button.addEventListener('click', () => this.loadWorldData(worldKey));
+                container.appendChild(button);
+            });
+
+            this.playAudioFile('vamos_a_jugar.mp3');
+            this.changeScreen('worlds');
+
+        } catch (error) {
+            console.error(error);
+            alert("Error al cargar la lista de mundos.");
+        }
+    }
+
+    async loadWorldData(worldKey) {
+        this.playSystemSound('click');
+        try {
+            const response = await fetch(`data/${worldKey}.json`);
+            if (!response.ok) throw new Error(`Falta el archivo data/${worldKey}.json`);
+            const worldData = await response.json();
+
+            this.buildWorkingDictionary(worldData);
+            
+            // Inicializar las 5 rondas finitas del nivel
+            this.currentRound = 0;
+            this.updateProgressBar();
+            this.changeScreen('game');
+
+            this.playModeIntroAudio(this.currentMode);
+            this.generateChallenge();
+
+        } catch (error) {
+            console.error(error);
+            alert("Error al cargar el archivo de la letra seleccionada.");
+        }
+    }
+
     buildWorkingDictionary(worldData) {
         this.loadedDictionary = [];
-        let globalIdCounter = 1000;
+        let idCounter = 2000;
 
         worldData.silabas.forEach(group => {
-            const currentTargetSyllable = group.silaba;
-            group.palabras.forEach(wordDataArray => {
-                globalIdCounter++;
+            group.palabras.forEach(wordArr => {
+                idCounter++;
                 this.loadedDictionary.push({
-                    id: globalIdCounter,
-                    target: currentTargetSyllable,
-                    syllablesArray: wordDataArray,
-                    fullWordString: wordDataArray.join("")
+                    id: idCounter,
+                    target: group.silaba,
+                    syllablesArray: wordArr,
+                    fullWordString: wordArr.join("")
                 });
             });
         });
     }
 
     /* ==========================================================================
-       GENERADOR DINÁMICO DE RETOS (AQUÍ SUCEDE LA MAGIA)
+       GENERADOR DINÁMICO DE RETOS Y MECÁNICAS
        ========================================================================== */
     generateChallenge() {
         this.feedbackElement.innerText = "";
         this.clearActiveTimers();
         this.playground.innerHTML = "";
 
-        // Filtrar para evitar repetir la última palabra jugada inmediatamente
         let validOptions = this.loadedDictionary.filter(item => item.id !== this.lastWordId);
         if (validOptions.length === 0) validOptions = this.loadedDictionary;
 
-        // Seleccionar el ítem base del reto de forma aleatoria
         const challengeBase = validOptions[Math.floor(Math.random() * validOptions.length)];
         this.lastWordId = challengeBase.id;
         
         this.targetSyllableElement.innerText = challengeBase.target.toUpperCase();
 
-        // Construir la fábrica de retos según la mecánica del modo de juego elegido
         if (this.currentMode === 1) this.setupMode1(challengeBase);
         if (this.currentMode === 2) this.setupMode2(challengeBase);
         if (this.currentMode === 3) this.setupMode3(challengeBase);
     }
 
-// INTERRUPTOR PARA VOLVER AL MENÚ PRINCIPAL (AÑADE ESTO):
-    backToMenu() {
-        this.playSystemSound('click');
-        this.clearActiveTimers();
-        this.screens.game.classList.remove('active');
-        this.screens.menu.classList.add('active');
-    }
-
-    /* ==========================================================================
-       MECÁNICAS REESCRITAS
-       ========================================================================== */
-
-    // MODO 1: Encuentra la sílaba dentro de la palabra fragmentada
     setupMode1(challenge) {
         const container = document.createElement('div');
         container.className = 'word-container';
-
         challenge.syllablesArray.forEach((syllable) => {
             const bubble = document.createElement('div');
             bubble.className = 'syllable-bubble';
             bubble.innerText = syllable.toUpperCase();
-            
             bubble.addEventListener('click', () => {
-                if (syllable.toUpperCase() === challenge.target.toUpperCase()) {
-                    this.handleOutcome(bubble, true);
-                } else {
-                    this.handleOutcome(bubble, false);
-                }
+                if (syllable.toUpperCase() === challenge.target.toUpperCase()) this.handleOutcome(bubble, true);
+                else this.handleOutcome(bubble, false);
             });
             container.appendChild(bubble);
         });
         this.playground.appendChild(container);
     }
 
-    // MODO 2: Seleccionar la palabra correcta entre 3 alternativas completas
     setupMode2(challenge) {
         const grid = document.createElement('div');
         grid.className = 'words-grid';
-
-        // Buscar señuelos (palabras de la base de datos que NO contengan la sílaba objetivo)
         let decoys = this.loadedDictionary.filter(item => item.target !== challenge.target);
         if (decoys.length < 2) decoys = this.loadedDictionary.filter(item => item.id !== challenge.id);
-        
         decoys = this.shuffleArray([...decoys]);
 
-        // Armar el juego de 3 opciones (1 correcta + 2 distractores)
         const options = [
             { text: challenge.fullWordString, correct: true },
-            { text: decoys[0]?.fullWordString || "CASA", correct: false },
-            { text: decoys[1]?.fullWordString || "GATO", correct: false }
+            { text: decoys[0]?.fullWordString || "SOL", correct: false },
+            { text: decoys[1]?.fullWordString || "OSO", correct: false }
         ];
 
         this.shuffleArray(options).forEach(opt => {
             const card = document.createElement('div');
             card.className = 'word-card';
             card.innerText = opt.text.toUpperCase();
-
             card.addEventListener('click', () => {
-                if (opt.correct) {
-                    this.handleOutcome(card, true);
-                } else {
-                    this.handleOutcome(card, false);
-                }
+                if (opt.correct) this.handleOutcome(card, true);
+                else this.handleOutcome(card, false);
             });
             grid.appendChild(card);
         });
         this.playground.appendChild(grid);
     }
 
-    // MODO 3: Torbellino flotante de sílabas dispersas
     setupMode3(challenge) {
         const container = document.createElement('div');
         container.className = 'floating-container';
         this.playground.appendChild(container);
 
-        // Extraer distractores mezclando otras sílabas conocidas del diccionario actual
-        const allPossibleSyllables = [...new Set(this.loadedDictionary.map(item => item.target))];
-        const fakeSyllables = allPossibleSyllables.filter(s => s !== challenge.target);
+        const allSyllables = [...new Set(this.loadedDictionary.map(item => item.target))];
+        const fakeSyllables = allSyllables.filter(s => s !== challenge.target);
 
-        // Generar pool dinámico de burbujas flotantes
-        let pool = [challenge.target, challenge.target, challenge.target]; // 3 Correctas garantizadas
+        let pool = [challenge.target, challenge.target, challenge.target];
         for (let i = 0; i < 5; i++) {
-            pool.push(fakeSyllables[Math.floor(Math.random() * fakeSyllables.length)] || "MA");
+            pool.push(fakeSyllables[Math.floor(Math.random() * fakeSyllables.length)] || "LA");
         }
         pool = this.shuffleArray(pool);
 
-        let correctHitsNeeded = 3;
         let dynamicScore = 0;
-
         pool.forEach((syllable) => {
             const bubble = document.createElement('div');
             bubble.className = 'floating-syllable';
@@ -251,22 +302,14 @@ class SilabinEngine {
 
             let posX = Math.random() * (this.playground.clientWidth - 120);
             let posY = Math.random() * (this.playground.clientHeight - 80);
-            let dx = (Math.random() - 0.5) * 1.2;
-            let dy = (Math.random() - 0.5) * 1.2;
+            let dx = (Math.random() - 0.5) * 1.2; let dy = (Math.random() - 0.5) * 1.2;
 
             const move = () => {
                 posX += dx; posY += dy;
                 if (posX <= 0 || posX >= container.clientWidth - bubble.offsetWidth) dx *= -1;
                 if (posY <= 0 || posY >= container.clientHeight - bubble.offsetHeight) dy *= -1;
-                
-                posX = Math.max(0, Math.min(posX, container.clientWidth - bubble.offsetWidth));
-                posY = Math.max(0, Math.min(posY, container.clientHeight - bubble.offsetHeight));
-
-                bubble.style.left = `${posX}px`;
-                bubble.style.top = `${posY}px`;
-
-                const animId = requestAnimationFrame(move);
-                this.animationFrameIds.push(animId);
+                bubble.style.left = `${posX}px`; bubble.style.top = `${posY}px`;
+                this.animationFrameIds.push(requestAnimationFrame(move));
             };
 
             bubble.addEventListener('click', (e) => {
@@ -276,22 +319,19 @@ class SilabinEngine {
                         bubble.classList.add('hit-success');
                         dynamicScore++;
                         this.playSystemSound('success');
-                        if (dynamicScore >= correctHitsNeeded) {
-                            this.handleOutcome(bubble, true, true);
-                        }
+                        if (dynamicScore >= 3) this.handleOutcome(bubble, true, true);
                     }
                 } else {
                     this.handleOutcome(bubble, false, false, true);
                 }
             });
-
             container.appendChild(bubble);
             move();
         });
     }
 
     /* ==========================================================================
-       NÚCLEO DE EVENTOS UX, LOGROS Y RECOMPENSAS
+       MANEJO DE FIN DE RETO Y PROGRESO FINITO DE NIVEL
        ========================================================================== */
     handleOutcome(element, isCorrect, skipSoundTrigger = false, remainsFloating = false) {
         if (isCorrect) {
@@ -303,43 +343,88 @@ class SilabinEngine {
             this.playMotivationAudio(true);
             this.triggerConfetti();
 
+            // Guardar estrellas locales por perfil
             this.stars++;
-            localStorage.setItem('silabin_stars', this.stars);
+            localStorage.setItem(`silabin_stars_${this.playerName}`, this.stars);
             this.updateStarDisplay();
 
-            const currentPointerState = this.playground.style.pointerEvents;
+            // Avanzar ronda en la barra
+            this.currentRound++;
+            this.updateProgressBar();
+
             this.playground.style.pointerEvents = 'none';
 
             setTimeout(() => {
-                this.playground.style.pointerEvents = currentPointerState;
-                this.generateChallenge();
+                this.playground.style.pointerEvents = 'auto';
+                
+                // CONTROLADOR DE CIERRE DEL NIVEL (Acaba a los 5 aciertos)
+                if (this.currentRound >= this.maxRoundsPerLevel) {
+                    this.endLevelWithVictory();
+                } else {
+                    this.generateChallenge();
+                }
             }, 2000);
 
         } else {
             element.classList.add('hit-fail');
             this.feedbackElement.style.color = "var(--color-primary)";
             this.feedbackElement.innerText = this.failTexts[Math.floor(Math.random() * this.failTexts.length)];
-            
             this.playSystemSound('fail');
             this.playMotivationAudio(false);
-
-            setTimeout(() => {
-                element.classList.remove('hit-fail');
-                if (remainsFloating) this.feedbackElement.innerText = "";
-            }, 1000);
+            setTimeout(() => { element.classList.remove('hit-fail'); }, 1000);
         }
     }
 
+    endLevelWithVictory() {
+        this.clearActiveTimers();
+        
+        // Evaluar si se superó el récord histórico personal del niño
+        if (this.stars > this.playerRecord) {
+            this.playerRecord = this.stars;
+            localStorage.setItem(`silabin_record_${this.playerName}`, this.playerRecord);
+            this.displayPlayerRecord.innerText = this.playerRecord;
+        }
+
+        this.playAudioFile('nivel_completado.mp3');
+        this.changeScreen('victory');
+        
+        // Lanzamiento masivo de confeti en bucle por fin de nivel
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => this.triggerConfetti(), i * 600);
+        }
+    }
+
+    updateProgressBar() {
+        const percentage = (this.currentRound / this.maxRoundsPerLevel) * 100;
+        this.progressBarFill.style.width = `${percentage}%`;
+    }
+
     /* ==========================================================================
-       AUDIO, MULTIMEDIA Y SISTEMA NATIVO WEBAUDIO
+       AUDIO, SWITCH DE PANTALLAS Y SISTEMA FX NATIVO
        ========================================================================== */
+    changeScreen(screenKey) {
+        Object.values(this.screens).forEach(scr => scr.classList.remove('active'));
+        this.screens[screenKey].classList.add('active');
+    }
+
+    backToMenu() {
+        this.playSystemSound('click');
+        this.clearActiveTimers();
+        this.changeScreen('menu');
+    }
+
+    toggleModal(modal, show) {
+        this.playSystemSound('click');
+        if (show) modal.classList.add('active');
+        else modal.classList.remove('active');
+    }
+
     playSystemSound(type) {
         if (!this.settings.audio) return;
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
         const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
 
         if (type === 'click') {
@@ -348,16 +433,14 @@ class SilabinEngine {
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
             osc.start(); osc.stop(ctx.currentTime + 0.1);
         } else if (type === 'success') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, ctx.currentTime);
             osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
             osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
             gain.gain.setValueAtTime(0.15, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
             osc.start(); osc.stop(ctx.currentTime + 0.4);
         } else if (type === 'fail') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, ctx.currentTime);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, ctx.currentTime);
             osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.2);
             gain.gain.setValueAtTime(0.12, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
@@ -369,7 +452,7 @@ class SilabinEngine {
         if (!this.settings.narration) return;
         const audio = new Audio(`audios/${filename}`);
         audio.volume = 0.9;
-        audio.play().catch(e => console.log("Prevención de bloqueos de interacción de Audio activa."));
+        audio.play().catch(e => console.log("Audio balance interactivo prevenido."));
     }
 
     playModeIntroAudio(mode) {
@@ -400,8 +483,7 @@ class SilabinEngine {
 
         for (let i = 0; i < 60; i++) {
             particles.push({
-                x: canvas.width / 2, y: canvas.height / 2,
-                radius: Math.random() * 6 + 4,
+                x: canvas.width / 2, y: canvas.height / 2, radius: Math.random() * 6 + 4,
                 color: colors[Math.floor(Math.random() * colors.length)],
                 vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.7) * 12, gravity: 0.25
             });
@@ -412,56 +494,37 @@ class SilabinEngine {
             particles.forEach(p => {
                 p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
                 if (p.y < canvas.height) {
-                    active = true; ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    active = true; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = p.color; ctx.fill();
                 }
             });
             if (active) requestAnimationFrame(animateConfetti);
-            else ctx.clearRect(0, 0, canvas.width, canvas.height);
         };
         animateConfetti();
-    }
-
-    /* ==========================================================================
-       INTERRUPTORES AUXILIARES Y UTILS
-       ========================================================================== */
-    toggleModal(modal, show) {
-        this.playSystemSound('click');
-        if (show) modal.classList.add('active');
-        else modal.classList.remove('active');
     }
 
     toggleFullscreen() {
         this.playSystemSound('click');
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen()
-                .then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar")
-                .catch(() => {});
+                .then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar").catch(() => {});
         } else {
             document.exitFullscreen();
             document.getElementById('btn-fullscreen').innerText = "Activar";
         }
     }
 
-    resetProgress() {
+    resetEverything() {
+        localStorage.clear();
+        this.playerName = "";
+        this.playerRecord = 0;
         this.stars = 0;
-        localStorage.setItem('silabin_stars', 0);
-        this.updateStarDisplay();
-        this.playSystemSound('success');
-        alert("¡El progreso ha sido reiniciado con éxito!");
-        this.toggleModal(this.modalParents, false);
+        alert("Todos los datos del dispositivo han sido borrados de fábrica.");
+        window.location.reload();
     }
 
-    updateStarDisplay() {
-        this.starCountElement.innerText = this.stars;
-    }
-
-    clearActiveTimers() {
-        this.animationFrameIds.forEach(id => cancelAnimationFrame(id));
-        this.animationFrameIds = [];
-    }
-
+    updateStarDisplay() { this.starCountElement.innerText = this.stars; }
+    clearActiveTimers() { this.animationFrameIds.forEach(id => cancelAnimationFrame(id)); this.animationFrameIds = []; }
     shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -472,6 +535,4 @@ class SilabinEngine {
 }
 
 let game;
-window.addEventListener('DOMContentLoaded', () => {
-    game = new SilabinEngine();
-});
+window.addEventListener('DOMContentLoaded', () => { game = new SilabinEngine(); });

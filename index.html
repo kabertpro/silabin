@@ -10,26 +10,54 @@
 
     <div id="app-container">
         
-        <section id="screen-menu" class="game-screen active">
+        <section id="screen-splash" class="game-screen active">
+            <div class="splash-logo">🎈</div>
+            <h1 class="splash-title">Silabín</h1>
+            <p class="splash-tagline">¡Aprender a leer es divertido!</p>
+            <button class="btn btn-primary pulse" id="btn-splash-start">👉 ¡VAMOS! 👈</button>
+        </section>
+
+        <section id="screen-profile" class="game-screen">
+            <h2 class="section-title">¿Cómo te llamas?</h2>
+            <div class="profile-box">
+                <input type="text" id="player-input" placeholder="Escribe tu nombre aquí..." maxlength="12">
+                <button class="btn btn-mode" id="btn-save-profile">✨ Guardar ✨</button>
+            </div>
+        </section>
+
+        <section id="screen-menu" class="game-screen">
+            <div class="welcome-bar">
+                <span>👋 ¡Hola, <strong id="display-player-name">-</strong>!</span>
+                <span class="top-record">🏆 Récord: <strong id="display-player-record">0</strong></span>
+            </div>
             <h1 class="game-title">Silabín</h1>
-            <p class="game-subtitle">Encuentra la Sílaba</p>
             
             <div class="menu-buttons">
-                <button class="btn btn-mode" onclick="game.startMode(1)">
+                <button class="btn btn-mode" onclick="game.selectMode(1)">
                     <span class="btn-icon">🔍</span> Encuentra la Sílaba
                 </button>
-                <button class="btn btn-mode" onclick="game.startMode(2)">
+                <button class="btn btn-mode" onclick="game.selectMode(2)">
                     <span class="btn-icon">❓</span> ¿Dónde está?
                 </button>
-                <button class="btn btn-mode" onclick="game.startMode(3)">
+                <button class="btn btn-mode" onclick="game.selectMode(3)">
                     <span class="btn-icon">🎈</span> Atrapa la Sílaba
                 </button>
             </div>
 
             <div class="footer-controls">
+                <button class="btn-circle" id="btn-change-user" title="Cambiar de Niño">👤</button>
                 <button class="btn-circle" id="btn-parents" title="Configuración para Padres">⚙️</button>
                 <button class="btn-circle" id="btn-credits" title="Créditos">ⓘ</button>
             </div>
+        </section>
+
+        <section id="screen-worlds" class="game-screen">
+            <div class="game-header">
+                <button class="btn-circle" onclick="game.changeScreen('menu')">🏠</button>
+                <h2 class="section-title">Elige qué jugar</h2>
+                <div style="width:60px;"></div>
+            </div>
+            <div id="worlds-grid-container" class="worlds-selection-grid"></div>
         </section>
 
         <section id="screen-game" class="game-screen">
@@ -39,12 +67,26 @@
                     <span class="target-label">Busca:</span>
                     <span id="target-syllable" class="target-syllable">-</span>
                 </div>
+                <div class="progress-tracker">
+                    <div id="progress-bar-fill" class="progress-fill"></div>
+                </div>
                 <div class="stars-counter">⭐ <span id="star-count">0</span></div>
             </div>
 
             <div id="game-playground" class="playground"></div>
-            
             <div id="feedback-message" class="feedback-message"></div>
+        </section>
+
+        <section id="screen-victory" class="game-screen">
+            <div class="victory-box">
+                <span class="medal-icon">🥇</span>
+                <h2>¡Nivel Completado!</h2>
+                <p>¡Lo hiciste increíble hecho!</p>
+                <div class="victory-stars">⭐⭐⭐</div>
+                <button class="btn btn-mode" onclick="game.changeScreen('menu')" style="background-color: var(--color-success)">
+                    🎉 ¡Volver a jugar!
+                </button>
+            </div>
         </section>
 
         <div id="modal-parents" class="modal-overlay">
@@ -64,7 +106,7 @@
                     <button id="btn-fullscreen" class="btn-small">Activar</button>
                 </div>
                 <div class="setting-item">
-                    <button id="btn-reset" class="btn btn-danger">Reiniciar Progreso</button>
+                    <button id="btn-reset" class="btn btn-danger">Reiniciar Todo</button>
                 </div>
                 <button class="btn btn-close modal-close">Cerrar</button>
             </div>
@@ -75,18 +117,13 @@
                 <h2>Silabín – Encuentra la Sílaba</h2>
                 <p class="version">Versión 1.0</p>
                 <p class="studio"><strong>Kabert Studio</strong> <br>by LMKE</p>
-                
                 <div class="dev-info">
                     <p><strong>Desarrollador:</strong><br>Luis Miguel Kapa Escobar</p>
-                    <a href="https://wa.me/59165665429" target="_blank" class="btn-whatsapp">
-                        💚 Contactar por WhatsApp
-                    </a>
+                    <a href="https://wa.me/59165665429" target="_blank" class="btn-whatsapp">💚 Contactar por WhatsApp</a>
                 </div>
-                
                 <blockquote class="message">
                     "Gracias por apoyar la educación infantil. Creemos que aprender jugando desarrolla la curiosidad, la creatividad y el amor por la lectura."
                 </blockquote>
-                
                 <button class="btn btn-close modal-close">Cerrar</button>
             </div>
         </div>
@@ -94,7 +131,6 @@
     </div>
 
     <canvas id="confetti-canvas"></canvas>
-
     <script src="script.js"></script>
 </body>
 </html>
