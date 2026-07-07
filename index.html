@@ -8,20 +8,33 @@
 </head>
 <body>
 
-    <div id="app-container">
-        
-        <section id="screen-splash" class="game-screen active">
+    <div id="screen-splash" class="splash-overlay active">
+        <div class="splash-center">
             <div class="splash-logo">🎈</div>
             <h1 class="splash-title">Silabín</h1>
-            <p class="splash-tagline">¡Aprender a leer es divertido!</p>
-            <button class="btn btn-primary pulse" id="btn-splash-start">👉 ¡VAMOS! 👈</button>
-        </section>
+            <p class="splash-tagline">Aprender a leer es divertido</p>
+            
+            <div class="splash-loading-bar">
+                <div id="splash-progress" class="splash-progress-fill"></div>
+            </div>
+            
+            <button class="btn btn-primary pulse hidden" id="btn-splash-start">👉 ¡VAMOS! 👈</button>
+        </div>
+    </div>
 
+    <div id="app-container">
+        
         <section id="screen-profile" class="game-screen">
             <h2 class="section-title">¿Cómo te llamas?</h2>
-            <div class="profile-box">
-                <input type="text" id="player-input" placeholder="Escribe tu nombre aquí..." maxlength="12">
-                <button class="btn btn-mode" id="btn-save-profile">✨ Guardar ✨</button>
+            <div class="profile-layout">
+                <div class="profile-input-box">
+                    <input type="text" id="player-input" placeholder="TU NOMBRE" readonly>
+                    <button class="btn-clear-name" id="btn-clear-name">❌ Borrar</button>
+                </div>
+                
+                <div id="virtual-keyboard" class="keyboard-grid"></div>
+                
+                <button class="btn btn-primary" id="btn-save-profile" style="width: 100%; max-width: 300px;">✨ ¡LISTO! ✨</button>
             </div>
         </section>
 
@@ -46,31 +59,45 @@
 
             <div class="footer-controls">
                 <button class="btn-circle" id="btn-change-user" title="Cambiar de Niño">👤</button>
-                <button class="btn-circle" id="btn-parents" title="Configuración para Padres">⚙️</button>
+                <button class="btn-circle" id="btn-parents" title="Ajustes">⚙️</button>
                 <button class="btn-circle" id="btn-credits" title="Créditos">ⓘ</button>
             </div>
         </section>
 
         <section id="screen-worlds" class="game-screen">
-            <div class="game-header">
-                <button class="btn-circle" onclick="game.changeScreen('menu')">🏠</button>
-                <h2 class="section-title">Elige qué jugar</h2>
-                <div style="width:60px;"></div>
+            <div class="game-header-professional">
+                <div class="header-left">
+                    <button class="btn-circle" onclick="game.changeScreen('menu')">🏠</button>
+                </div>
+                <div class="header-center">
+                    <h2 class="section-title-header">Elige qué jugar</h2>
+                </div>
+                <div class="header-right" style="opacity:0; pointer-events:none;">
+                    <div class="stars-badge">⭐ 0</div>
+                </div>
             </div>
             <div id="worlds-grid-container" class="worlds-selection-grid"></div>
         </section>
 
         <section id="screen-game" class="game-screen">
-            <div class="game-header">
-                <button class="btn-circle back-home" onclick="game.backToMenu()">🏠</button>
-                <div class="target-container">
-                    <span class="target-label">Busca:</span>
-                    <span id="target-syllable" class="target-syllable">-</span>
+            <div class="game-header-professional">
+                <div class="header-left">
+                    <button class="btn-circle" onclick="game.backToMenu()">🏠</button>
                 </div>
-                <div class="progress-tracker">
-                    <div id="progress-bar-fill" class="progress-fill"></div>
+                
+                <div class="header-center">
+                    <span class="instruction-text">Busca la sílaba:</span>
+                    <span id="target-syllable" class="target-badge">-</span>
                 </div>
-                <div class="stars-counter">⭐ <span id="star-count">0</span></div>
+                
+                <div class="header-right">
+                    <div class="progress-box">
+                        <div class="progress-tracker">
+                            <div id="progress-bar-fill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="stars-badge">⭐ <span id="star-count">0</span></div>
+                </div>
             </div>
 
             <div id="game-playground" class="playground"></div>
@@ -81,9 +108,9 @@
             <div class="victory-box">
                 <span class="medal-icon">🥇</span>
                 <h2>¡Nivel Completado!</h2>
-                <p>¡Lo hiciste increíble hecho!</p>
+                <p>¡Lo hiciste increíble!</p>
                 <div class="victory-stars">⭐⭐⭐</div>
-                <button class="btn btn-mode" onclick="game.changeScreen('menu')" style="background-color: var(--color-success)">
+                <button class="btn btn-primary pulse" onclick="game.changeScreen('menu')">
                     🎉 ¡Volver a jugar!
                 </button>
             </div>
@@ -93,38 +120,21 @@
             <div class="modal-content">
                 <h2>Ajustes para Padres</h2>
                 <hr>
-                <div class="setting-item">
-                    <label for="setting-audio">🔊 Efectos de Sonido</label>
-                    <input type="checkbox" id="setting-audio" checked>
-                </div>
-                <div class="setting-item">
-                    <label for="setting-narration">🗣️ Narración / Voces</label>
-                    <input type="checkbox" id="setting-narration" checked>
-                </div>
-                <div class="setting-item">
-                    <label for="setting-fullscreen">📺 Pantalla Completa</label>
-                    <button id="btn-fullscreen" class="btn-small">Activar</button>
-                </div>
-                <div class="setting-item">
-                    <button id="btn-reset" class="btn btn-danger">Reiniciar Todo</button>
-                </div>
+                <div class="setting-item"><label>🔊 Efectos de Sonido</label><input type="checkbox" id="setting-audio" checked></div>
+                <div class="setting-item"><label>🗣️ Narración / Voces</label><input type="checkbox" id="setting-narration" checked></div>
+                <div class="setting-item"><label>📺 Pantalla Completa</label><button id="btn-fullscreen" class="btn-small">Activar</button></div>
+                <div class="setting-item"><button id="btn-reset" class="btn btn-danger">Reiniciar Todo</button></div>
                 <button class="btn btn-close modal-close">Cerrar</button>
             </div>
         </div>
 
         <div id="modal-credits" class="modal-overlay">
-            <div class="modal-content credits-content">
+            <div class="modal-content">
                 <h2>Silabín – Encuentra la Sílaba</h2>
-                <p class="version">Versión 1.0</p>
                 <p class="studio"><strong>Kabert Studio</strong> <br>by LMKE</p>
-                <div class="dev-info">
-                    <p><strong>Desarrollador:</strong><br>Luis Miguel Kapa Escobar</p>
-                    <a href="https://wa.me/59165665429" target="_blank" class="btn-whatsapp">💚 Contactar por WhatsApp</a>
-                </div>
-                <blockquote class="message">
-                    "Gracias por apoyar la educación infantil. Creemos que aprender jugando desarrolla la curiosidad, la creatividad y el amor por la lectura."
-                </blockquote>
-                <button class="btn btn-close modal-close">Cerrar</button>
+                <p style="margin: 10px 0;"><strong>Desarrollador:</strong><br>Luis Miguel Kapa Escobar</p>
+                <a href="https://wa.me/59165665429" target="_blank" class="btn-whatsapp">💚 WhatsApp</a>
+                <button class="btn btn-close modal-close" style="margin-top:20px;">Cerrar</button>
             </div>
         </div>
 

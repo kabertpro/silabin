@@ -1,40 +1,37 @@
 /**
  * PROYECTO: SILABÍN – ENCUENTRA LA SÍLABA
  * Desarrollador: Kabert Studio - by LMKE (Luis Miguel Kapa Escobar)
- * Arquitectura: Conectores de Diccionario Modular y Sistema de Progreso por Pasos.
+ * Versión: 2.0 (Resistente a fallos de carga HTTP / Sistema Fallback de Respaldo)
  */
 
 class SilabinEngine {
     constructor() {
-        // Variables del Jugador y Récords
         this.playerName = "";
         this.playerRecord = 0;
         this.stars = 0;
 
-        // Estructura de Control de Niveles Finitos (5 retos por juego)
         this.currentMode = null;
         this.currentRound = 0;
         this.maxRoundsPerLevel = 5;
 
-        // Base de datos cargada
-        this.availableWorlds = [];
+        // Lista interna por defecto en caso de que falle index.json de forma externa
+        this.availableWorlds = ["vocales", "m", "p"];
         this.loadedDictionary = [];
-        this.currentChallenge = null;
         this.lastWordId = null;
         this.animationFrameIds = [];
 
-        // Parámetros del Panel
         this.settings = {
             audio: JSON.parse(localStorage.getItem('silabin_audio')) !== false,
             narration: JSON.parse(localStorage.getItem('silabin_narration')) !== false
         };
 
-        this.successTexts = ["¡Muy bien!", "¡Excelente!", "¡Lo lograste!", "¡Fantástico!", "¡Muy bien hecho!"];
+        this.successTexts = ["¡Muy bien!", "¡Excelente!", "¡Lo lograste!", "¡Fantástico!", "¡Increíble!"];
         this.failTexts = ["¡Casi!", "Inténtalo otra vez", "Tómate tu tiempo", "Tú puedes"];
 
         this.initDOM();
+        this.buildVirtualKeyboard();
         this.registerEvents();
-        this.loadProfileFromDevice();
+        this.runSplashLoader();
     }
 
     initDOM() {
@@ -55,34 +52,76 @@ class SilabinEngine {
         this.modalParents = document.getElementById('modal-parents');
         this.modalCredits = document.getElementById('modal-credits');
 
-        // Textos del Menú
         this.displayPlayerName = document.getElementById('display-player-name');
         this.displayPlayerRecord = document.getElementById('display-player-record');
+        this.playerInput = document.getElementById('player-input');
         
         document.getElementById('setting-audio').checked = this.settings.audio;
         document.getElementById('setting-narration').checked = this.settings.narration;
     }
 
+    runSplashLoader() {
+        const progressFill = document.getElementById('splash-progress');
+        const startBtn = document.getElementById('btn-splash-start');
+        let width = 0;
+
+        const interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+                progressFill.parentElement.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+            } else {
+                width += 25; // Carga profesional rápida e interactiva
+                progressFill.style.width = `${width}%`;
+            }
+        }, 150);
+    }
+
+    buildVirtualKeyboard() {
+        const keyboardContainer = document.getElementById('virtual-keyboard');
+        const alphabet = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
+
+        keyboardContainer.innerHTML = ""; // Limpieza preventiva
+        alphabet.forEach(letter => {
+            const keyBtn = document.createElement('button');
+            keyBtn.className = "btn-key";
+            keyBtn.innerText = letter;
+            keyBtn.addEventListener('click', () => {
+                this.playSystemSound('click');
+                if (this.playerInput.value.length < 12) {
+                    this.playerInput.value += letter;
+                }
+            });
+            keyboardContainer.appendChild(keyBtn);
+        });
+
+        document.getElementById('btn-clear-name').addEventListener('click', () => {
+            this.playSystemSound('click');
+            this.playerInput.value = "";
+        });
+    }
+
     registerEvents() {
-        // Pantalla Splash
         document.getElementById('btn-splash-start').addEventListener('click', () => {
             this.playSystemSound('click');
-            this.playAudioFile('hola.mp3');
+            this.screens.splash.classList.remove('active');
+            this.loadProfileFromDevice();
             if (!this.playerName) {
                 this.changeScreen('profile');
             } else {
+                this.playAudioFile('hola.mp3');
                 this.changeScreen('menu');
             }
         });
 
-        // Pantalla de Nombre
         document.getElementById('btn-save-profile').addEventListener('click', () => this.saveProfile());
+        
         document.getElementById('btn-change-user').addEventListener('click', () => {
             this.playSystemSound('click');
+            this.playerInput.value = "";
             this.changeScreen('profile');
         });
 
-        // Modales Básicos
         document.getElementById('btn-parents').addEventListener('click', () => this.toggleModal(this.modalParents, true));
         document.getElementById('btn-credits').addEventListener('click', () => this.toggleModal(this.modalCredits, true));
         
@@ -106,9 +145,6 @@ class SilabinEngine {
         document.getElementById('btn-reset').addEventListener('click', () => this.resetEverything());
     }
 
-    /* ==========================================================================
-       SISTEMA DE PERFILES DE JUGADORES
-       ========================================================================== */
     loadProfileFromDevice() {
         const activeUser = localStorage.getItem('silabin_current_user');
         if (activeUser) {
@@ -123,87 +159,80 @@ class SilabinEngine {
     }
 
     saveProfile() {
-        const input = document.getElementById('player-input').value.trim();
-        if (!input) return alert("Por favor escribe tu nombre");
+        const input = this.playerInput.value.trim();
+        if (!input) return;
 
         this.playSystemSound('click');
         this.playerName = input;
         localStorage.setItem('silabin_current_user', input);
 
-        // Si es un perfil totalmente nuevo, inicializamos su registro histórico en 0
         if (!localStorage.getItem(`silabin_record_${input}`)) {
             localStorage.setItem(`silabin_record_${input}`, 0);
             localStorage.setItem(`silabin_stars_${input}`, 0);
         }
 
         this.loadProfileFromDevice();
-        document.getElementById('player-input').value = ""; // Limpiar input
         this.playAudioFile('bienvenido_a_silabin.mp3');
         this.changeScreen('menu');
     }
 
     /* ==========================================================================
-       SELECTOR DE MUNDOS / CONSONANTES (NO ALEATORIO)
+       CARGADOR CON FALLBACK INCORPORADO (EVITA EL ERROR DE CARGA)
        ========================================================================== */
     async selectMode(modeNumber) {
         this.playSystemSound('click');
         this.currentMode = modeNumber;
         
         try {
-            // Leer index.json para renderizar los botones disponibles
+            // Intentar leer de index.json
             const response = await fetch('data/index.json');
-            if (!response.ok) throw new Error("Falta index.json");
-            const data = await response.json();
-            this.availableWorlds = data.worlds;
-
-            // Renderizado interactivo del Grid de Letras
-            const container = document.getElementById('worlds-grid-container');
-            container.innerHTML = "";
-
-            this.availableWorlds.forEach(worldKey => {
-                const button = document.createElement('button');
-                button.className = 'btn-world';
-                button.innerText = worldKey.toUpperCase();
-                button.addEventListener('click', () => this.loadWorldData(worldKey));
-                container.appendChild(button);
-            });
-
-            this.playAudioFile('vamos_a_jugar.mp3');
-            this.changeScreen('worlds');
-
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.worlds) this.availableWorlds = data.worlds;
+            }
         } catch (error) {
-            console.error(error);
-            alert("Error al cargar la lista de mundos.");
+            console.log("Aviso: index.json inaccesible. Activando redundancia local integrada.");
+            // Si el servidor falla, mantiene ["vocales", "m", "p"] definidos arriba.
         }
+
+        // Construcción segura del grid de botones
+        const container = document.getElementById('worlds-grid-container');
+        container.innerHTML = "";
+
+        this.availableWorlds.forEach(worldKey => {
+            const button = document.createElement('button');
+            button.className = 'btn-world';
+            button.innerText = worldKey.toUpperCase();
+            button.addEventListener('click', () => this.loadWorldData(worldKey));
+            container.appendChild(button);
+        });
+
+        this.playAudioFile('vamos_a_jugar.mp3');
+        this.changeScreen('worlds');
     }
 
     async loadWorldData(worldKey) {
         this.playSystemSound('click');
         try {
             const response = await fetch(`data/${worldKey}.json`);
-            if (!response.ok) throw new Error(`Falta el archivo data/${worldKey}.json`);
+            if (!response.ok) throw new Error();
             const worldData = await response.json();
 
             this.buildWorkingDictionary(worldData);
-            
-            // Inicializar las 5 rondas finitas del nivel
             this.currentRound = 0;
             this.updateProgressBar();
             this.changeScreen('game');
 
             this.playModeIntroAudio(this.currentMode);
             this.generateChallenge();
-
         } catch (error) {
-            console.error(error);
-            alert("Error al cargar el archivo de la letra seleccionada.");
+            alert(`No se pudo leer el archivo: data/${worldKey}.json. Asegúrate de haberlo subido en minúsculas.`);
         }
     }
 
     buildWorkingDictionary(worldData) {
         this.loadedDictionary = [];
-        let idCounter = 2000;
-
+        let idCounter = 4000;
         worldData.silabas.forEach(group => {
             group.palabras.forEach(wordArr => {
                 idCounter++;
@@ -217,9 +246,6 @@ class SilabinEngine {
         });
     }
 
-    /* ==========================================================================
-       GENERADOR DINÁMICO DE RETOS Y MECÁNICAS
-       ========================================================================== */
     generateChallenge() {
         this.feedbackElement.innerText = "";
         this.clearActiveTimers();
@@ -289,7 +315,7 @@ class SilabinEngine {
         const fakeSyllables = allSyllables.filter(s => s !== challenge.target);
 
         let pool = [challenge.target, challenge.target, challenge.target];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             pool.push(fakeSyllables[Math.floor(Math.random() * fakeSyllables.length)] || "LA");
         }
         pool = this.shuffleArray(pool);
@@ -300,9 +326,9 @@ class SilabinEngine {
             bubble.className = 'floating-syllable';
             bubble.innerText = syllable.toUpperCase();
 
-            let posX = Math.random() * (this.playground.clientWidth - 120);
-            let posY = Math.random() * (this.playground.clientHeight - 80);
-            let dx = (Math.random() - 0.5) * 1.2; let dy = (Math.random() - 0.5) * 1.2;
+            let posX = Math.random() * (this.playground.clientWidth - 110);
+            let posY = Math.random() * (this.playground.clientHeight - 70);
+            let dx = (Math.random() - 0.5) * 1.6; let dy = (Math.random() - 0.5) * 1.6;
 
             const move = () => {
                 posX += dx; posY += dy;
@@ -330,9 +356,6 @@ class SilabinEngine {
         });
     }
 
-    /* ==========================================================================
-       MANEJO DE FIN DE RETO Y PROGRESO FINITO DE NIVEL
-       ========================================================================== */
     handleOutcome(element, isCorrect, skipSoundTrigger = false, remainsFloating = false) {
         if (isCorrect) {
             element.classList.add('hit-success');
@@ -343,28 +366,22 @@ class SilabinEngine {
             this.playMotivationAudio(true);
             this.triggerConfetti();
 
-            // Guardar estrellas locales por perfil
             this.stars++;
             localStorage.setItem(`silabin_stars_${this.playerName}`, this.stars);
             this.updateStarDisplay();
 
-            // Avanzar ronda en la barra
             this.currentRound++;
             this.updateProgressBar();
-
             this.playground.style.pointerEvents = 'none';
 
             setTimeout(() => {
                 this.playground.style.pointerEvents = 'auto';
-                
-                // CONTROLADOR DE CIERRE DEL NIVEL (Acaba a los 5 aciertos)
                 if (this.currentRound >= this.maxRoundsPerLevel) {
                     this.endLevelWithVictory();
                 } else {
                     this.generateChallenge();
                 }
-            }, 2000);
-
+            }, 1800);
         } else {
             element.classList.add('hit-fail');
             this.feedbackElement.style.color = "var(--color-primary)";
@@ -377,21 +394,14 @@ class SilabinEngine {
 
     endLevelWithVictory() {
         this.clearActiveTimers();
-        
-        // Evaluar si se superó el récord histórico personal del niño
         if (this.stars > this.playerRecord) {
             this.playerRecord = this.stars;
             localStorage.setItem(`silabin_record_${this.playerName}`, this.playerRecord);
             this.displayPlayerRecord.innerText = this.playerRecord;
         }
-
         this.playAudioFile('nivel_completado.mp3');
         this.changeScreen('victory');
-        
-        // Lanzamiento masivo de confeti en bucle por fin de nivel
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => this.triggerConfetti(), i * 600);
-        }
+        for (let i = 0; i < 3; i++) { setTimeout(() => this.triggerConfetti(), i * 500); }
     }
 
     updateProgressBar() {
@@ -399,25 +409,13 @@ class SilabinEngine {
         this.progressBarFill.style.width = `${percentage}%`;
     }
 
-    /* ==========================================================================
-       AUDIO, SWITCH DE PANTALLAS Y SISTEMA FX NATIVO
-       ========================================================================== */
     changeScreen(screenKey) {
         Object.values(this.screens).forEach(scr => scr.classList.remove('active'));
         this.screens[screenKey].classList.add('active');
     }
 
-    backToMenu() {
-        this.playSystemSound('click');
-        this.clearActiveTimers();
-        this.changeScreen('menu');
-    }
-
-    toggleModal(modal, show) {
-        this.playSystemSound('click');
-        if (show) modal.classList.add('active');
-        else modal.classList.remove('active');
-    }
+    backToMenu() { this.playSystemSound('click'); this.clearActiveTimers(); this.changeScreen('menu'); }
+    toggleModal(modal, show) { this.playSystemSound('click'); if (show) modal.classList.add('active'); else modal.classList.remove('active'); }
 
     playSystemSound(type) {
         if (!this.settings.audio) return;
@@ -426,25 +424,16 @@ class SilabinEngine {
         const ctx = new AudioContext();
         const osc = ctx.createOscillator(); const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
-
         if (type === 'click') {
-            osc.frequency.setValueAtTime(400, ctx.currentTime);
-            gain.gain.setValueAtTime(0.1, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-            osc.start(); osc.stop(ctx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(400, ctx.currentTime); gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); osc.start(); osc.stop(ctx.currentTime + 0.1);
         } else if (type === 'success') {
             osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-            osc.start(); osc.stop(ctx.currentTime + 0.4);
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4); osc.start(); osc.stop(ctx.currentTime + 0.4);
         } else if (type === 'fail') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, ctx.currentTime);
-            osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.12, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-            osc.start(); osc.stop(ctx.currentTime + 0.25);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, ctx.currentTime); osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.12, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25); osc.start(); osc.stop(ctx.currentTime + 0.25);
         }
     }
 
@@ -452,7 +441,7 @@ class SilabinEngine {
         if (!this.settings.narration) return;
         const audio = new Audio(`audios/${filename}`);
         audio.volume = 0.9;
-        audio.play().catch(e => console.log("Audio balance interactivo prevenido."));
+        audio.play().catch(() => {});
     }
 
     playModeIntroAudio(mode) {
@@ -461,77 +450,41 @@ class SilabinEngine {
             2: ["busca_la_palabra_correcta.mp3", "elige_la_correcta.mp3"],
             3: ["escucha_con_atencion.mp3", "toca_la_respuesta_correcta.mp3"]
         };
-        const choices = intros[mode];
-        this.playAudioFile(choices[Math.floor(Math.random() * choices.length)]);
+        this.playAudioFile(intros[mode][Math.floor(Math.random() * 2)]);
     }
 
     playMotivationAudio(isCorrect) {
         const correctTracks = ["muy_bien.mp3", "excelente.mp3", "correcto.mp3", "fantastico.mp3", "lo_lograste.mp3"];
         const incorrectTracks = ["casi.mp3", "intentalo_otra_vez.mp3", "sigue_adelante.mp3", "puedes_volver_a_intentarlo.mp3"];
         if (Math.random() > 0.4) {
-            const track = isCorrect ? correctTracks[Math.floor(Math.random() * correctTracks.length)] : incorrectTracks[Math.floor(Math.random() * incorrectTracks.length)];
-            this.playAudioFile(track);
+            this.playAudioFile(isCorrect ? correctTracks[Math.floor(Math.random() * 5)] : incorrectTracks[Math.floor(Math.random() * 4)]);
         }
     }
 
     triggerConfetti() {
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let particles = [];
-        const colors = ['#FF6B6B', '#4DBCFF', '#6BCB77', '#FFA62F', '#FFF'];
-
-        for (let i = 0; i < 60; i++) {
-            particles.push({
-                x: canvas.width / 2, y: canvas.height / 2, radius: Math.random() * 6 + 4,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.7) * 12, gravity: 0.25
-            });
+        let particles = []; const colors = ['#FF6B6B', '#4DBCFF', '#6BCB77', '#FFA62F', '#FFF'];
+        for (let i = 0; i < 50; i++) {
+            particles.push({ x: canvas.width / 2, y: canvas.height / 2, radius: Math.random() * 5 + 3, color: colors[Math.floor(Math.random() * 5)], vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.7) * 10, gravity: 0.2 });
         }
-        const animateConfetti = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let active = false;
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
-                if (p.y < canvas.height) {
-                    active = true; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color; ctx.fill();
-                }
-            });
-            if (active) requestAnimationFrame(animateConfetti);
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); let active = false;
+            particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += p.gravity; if (p.y < canvas.height) { active = true; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill(); } });
+            if (active) requestAnimationFrame(animate);
         };
-        animateConfetti();
+        animate();
     }
 
     toggleFullscreen() {
-        this.playSystemSound('click');
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen()
-                .then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar").catch(() => {});
-        } else {
-            document.exitFullscreen();
-            document.getElementById('btn-fullscreen').innerText = "Activar";
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar").catch(() => {});
+        else { document.exitFullscreen(); document.getElementById('btn-fullscreen').innerText = "Activar"; }
     }
 
-    resetEverything() {
-        localStorage.clear();
-        this.playerName = "";
-        this.playerRecord = 0;
-        this.stars = 0;
-        alert("Todos los datos del dispositivo han sido borrados de fábrica.");
-        window.location.reload();
-    }
-
+    resetEverything() { localStorage.clear(); alert("Reiniciado."); window.location.reload(); }
     updateStarDisplay() { this.starCountElement.innerText = this.stars; }
     clearActiveTimers() { this.animationFrameIds.forEach(id => cancelAnimationFrame(id)); this.animationFrameIds = []; }
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
+    shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 }
 
 let game;

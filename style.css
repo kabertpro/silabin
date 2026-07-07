@@ -1,6 +1,3 @@
-/* ==========================================================================
-   CONFIGURACIÓN GENERAL Y PALETA INFANTIL REFORZADA
-   ========================================================================== */
 :root {
     --bg-main: #FFDE4D;
     --bg-app: #FFF9E6;
@@ -9,266 +6,120 @@
     --color-success: #6BCB77;
     --color-warning: #FFA62F;
     --text-dark: #2C3E50;
-    --radius-large: 24px;
+    --radius-large: 28px;
     --radius-round: 50%;
     --font-game: 'Fredoka One', 'Comic Sans MS', system-ui, sans-serif;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+body { background-color: var(--bg-main); font-family: var(--font-game); color: var(--text-dark); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; padding: 15px; }
+
+/* REESTRUCTURACIÓN DEL SPLASH DE PANTALLA COMPLETA */
+.splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--bg-main); display: none; justify-content: center; align-items: center; z-index: 9999; }
+.splash-overlay.active { display: flex; }
+.splash-center { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.splash-logo { font-size: 7rem; animation: floatLogo 2s ease-in-out infinite; line-height: 1; }
+.splash-title { font-size: 5.5rem; color: var(--color-primary); text-shadow: 4px 4px 0 #FFF; margin: 10px 0; line-height: 1.1; }
+.splash-tagline { font-size: 1.8rem; color: #FFF; font-weight: bold; margin-bottom: 30px; text-shadow: 2px 2px 0 rgba(0,0,0,0.1); }
+
+.splash-loading-bar { width: 280px; height: 24px; background: rgba(255,255,255,0.4); border-radius: 50px; overflow: hidden; padding: 3px; border: 3px solid #FFF; }
+.splash-progress-fill { width: 0%; height: 100%; background: var(--color-success); border-radius: 50px; transition: width 0.1s linear; }
+
+/* MARCO CONTENEDOR DE LA APP */
+#app-container { width: 100%; max-width: 960px; height: 90vh; max-height: 640px; background-color: var(--bg-app); border-radius: var(--radius-large); box-shadow: 0 16px 32px rgba(0,0,0,0.15); position: relative; overflow: hidden; border: 10px solid #FFF; }
+
+.game-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
+.game-screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
+
+/* CABECERA ALINEADA PROFESIONAL */
+.game-header-professional { width: 94%; display: grid; grid-template-columns: 70px 1fr 230px; align-items: center; background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 6px 0 rgba(0,0,0,0.02); position: absolute; top: 15px; left: 3%; z-index: 10; }
+.header-left { display: flex; justify-content: flex-start; }
+.header-center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.header-right { display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
+
+.instruction-text { font-size: 1rem; color: #7F8C8D; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+.target-badge { font-size: 2.3rem; color: var(--color-primary); font-weight: bold; background: var(--bg-app); padding: 0px 25px; border-radius: 12px; border: 3px solid var(--color-warning); min-width: 110px; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+
+.progress-tracker { width: 120px; height: 18px; background: #E0E0E0; border-radius: 50px; overflow: hidden; border: 2px solid #FFF; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+.progress-fill { width: 0%; height: 100%; background: var(--color-success); transition: width 0.3s ease; }
+.stars-badge { background: var(--color-warning); color: white; padding: 6px 16px; font-size: 1.2rem; border-radius: 50px; border: 3px solid white; font-weight: bold; }
+
+/* INTERFAZ REGISTRO Y TECLADO */
+.profile-layout { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 650px; }
+.profile-input-box { display: flex; gap: 10px; width: 100%; max-width: 450px; }
+#player-input { width: 100%; font-family: var(--font-game); font-size: 1.8rem; padding: 10px; text-align: center; border: 4px solid var(--color-secondary); border-radius: 15px; background: white; outline: none; color: var(--text-dark); }
+.btn-clear-name { font-family: var(--font-game); background: #E74C3C; color: white; border: none; padding: 0 15px; border-radius: 15px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+
+.keyboard-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; background: white; padding: 12px; border-radius: 20px; border: 4px solid #E0E0E0; width: 100%; }
+.btn-key { background: #FFF; border: 3px solid #E0E0E0; border-radius: 12px; font-family: var(--font-game); font-size: 1.3rem; font-weight: bold; padding: 8px 0; cursor: pointer; color: var(--text-dark); box-shadow: 0 4px 0 #E0E0E0; transition: all 0.05s; }
+.btn-key:active { transform: translateY(3px); box-shadow: 0 1px 0 #E0E0E0; }
+
+/* SELECTOR DE MUNDOS INTERMEDIO */
+.section-title-header { font-size: 2rem; color: var(--color-primary); margin: 0; text-align: center; width: 100%; }
+.worlds-selection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 700px; padding: 10px; margin-top: 80px; height: 65%; overflow-y: auto; align-content: center; }
+.btn-world { background: white; border: 4px solid #E0E0E0; font-family: var(--font-game); font-size: 2rem; padding: 12px; border-radius: 20px; cursor: pointer; box-shadow: 0 6px 0 #E0E0E0; color: var(--text-dark); font-weight: bold; }
+.btn-world:active { transform: translateY(4px); box-shadow: 0 2px 0 #E0E0E0; }
+
+/* MENÚ PRINCIPAL */
+.welcome-bar { position: absolute; top: 15px; width: 92%; display: flex; justify-content: space-between; font-size: 1.2rem; background: #FFF; padding: 10px 25px; border-radius: 50px; }
+.game-title { font-size: 4.5rem; color: var(--color-primary); text-shadow: 3px 3px 0 #FFF; margin-bottom: 20px; }
+.menu-buttons { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; }
+
+/* ÁREA DE JUEGO (PLAYGROUND) */
+.playground { width: 100%; height: 55%; margin-top: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+.word-container { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+.syllable-bubble { background: white; padding: 18px 32px; font-size: 2.8rem; border-radius: var(--radius-large); border: 4px solid #E0E0E0; cursor: pointer; box-shadow: 0 8px 0 #E0E0E0; }
+.words-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 460px; }
+.word-card { background: white; padding: 14px; font-size: 2.2rem; text-align: center; border-radius: var(--radius-large); border: 4px solid #E0E0E0; box-shadow: 0 8px 0 #E0E0E0; cursor: pointer; }
+.floating-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
+.floating-syllable { position: absolute; background: #FFF; padding: 12px 22px; font-size: 1.9rem; border-radius: 50px; border: 4px solid var(--color-secondary); box-shadow: 0 5px 0 var(--color-secondary); cursor: pointer; }
+
+/* CONTROL DE INTERRUPTORES DE RESPUESTAS */
+.hit-success { background-color: var(--color-success) !important; color: white !important; border-color: #55B061 !important; box-shadow: 0 4px 0 #449050 !important; transform: scale(1.05); }
+.hit-fail { background-color: #FF8A8A !important; color: white !important; border-color: #E06C6C !important; box-shadow: 0 4px 0 #C25353 !important; animation: shake 0.3s ease; }
+
+.feedback-message { height: 30px; font-size: 1.6rem; font-weight: bold; margin-top: 10px; text-align: center; }
+.footer-controls { position: absolute; bottom: 15px; width: 92%; display: flex; justify-content: space-between; }
+
+/* DISEÑO RESPONSIVO (MOBILE FIRST AUTOMÁTICO) */
+@media (max-width: 768px) {
+    .game-header-professional { grid-template-columns: 60px 1fr; width: 96%; left: 2%; }
+    .header-right { display: none; }
+    .keyboard-grid { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+    .worlds-selection-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .syllable-bubble { font-size: 2.2rem; padding: 12px 24px; }
+    .word-card { font-size: 1.8rem; }
+    .game-title { font-size: 3.2rem; }
 }
 
-body {
-    background-color: var(--bg-main);
-    font-family: var(--font-game);
-    color: var(--text-dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden;
-    padding: 10px;
-}
-
-#app-container {
-    width: 100%;
-    max-width: 900px;
-    height: 95vh;
-    max-height: 600px;
-    background-color: var(--bg-app);
-    border-radius: var(--radius-large);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-    position: relative;
-    overflow: hidden;
-    border: 8px solid #FFF;
-}
-
-.game-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background-color: var(--bg-app);
-}
-
-.game-screen.active {
-    display: flex;
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* ==========================================================================
-   NUEVOS MÓDULOS: SPLASH, PERFIL Y BARRA DE PROGRESO
-   ========================================================================== */
-
-/* Splash Screen Animada */
-.splash-logo {
-    font-size: 6rem;
-    animation: floatLogo 2s ease-in-out infinite;
-}
-.splash-title {
-    font-size: 5rem;
-    color: var(--color-primary);
-    text-shadow: 4px 4px 0 #FFF, 7px 7px 0 rgba(0,0,0,0.05);
-    margin: 10px 0;
-}
-.splash-tagline {
-    font-size: 1.6rem;
-    color: var(--color-secondary);
-    margin-bottom: 30px;
-    font-weight: bold;
-}
-
-/* Barra de Perfil Superior */
-.welcome-bar {
-    position: absolute;
-    top: 15px;
-    width: 90%;
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.2rem;
-    background: #FFF;
-    padding: 8px 20px;
-    border-radius: 50px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.05);
-}
-.top-record { color: var(--color-warning); }
-
-/* Caja de Registro de Nombre */
-.profile-box {
-    background: white;
-    padding: 30px;
-    border-radius: var(--radius-large);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    max-width: 400px;
-}
-#player-input {
-    font-family: var(--font-game);
-    font-size: 1.6rem;
-    padding: 12px;
-    text-align: center;
-    border: 4px solid var(--color-secondary);
-    border-radius: 15px;
-    outline: none;
-    color: var(--text-dark);
-}
-
-/* Selector de Letras / Mundos */
-.section-title {
-    font-size: 2.2rem;
-    color: var(--color-primary);
-    margin-bottom: 10px;
-}
-.worlds-selection-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    width: 100%;
-    max-width: 650px;
-    max-height: 70%;
-    overflow-y: auto;
-    padding: 10px;
-}
-.btn-world {
-    background: white;
-    border: 4px solid #E0E0E0;
-    font-family: var(--font-game);
-    font-size: 2rem;
-    padding: 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    box-shadow: 0 6px 0 #E0E0E0;
-    transition: all 0.1s;
-    color: var(--text-dark);
-}
-.btn-world:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #E0E0E0;
-}
-
-/* Barra de progreso visual */
-.progress-tracker {
-    width: 150px;
-    height: 20px;
-    background: #E0E0E0;
-    border-radius: 50px;
-    overflow: hidden;
-    border: 2px solid white;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-}
-.progress-fill {
-    width: 0%;
-    height: 100%;
-    background: var(--color-success);
-    transition: width 0.4s ease-out;
-}
-
-/* Pantalla de Fin de Nivel / Victoria */
-.victory-box {
-    text-align: center;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.medal-icon { font-size: 7rem; display: block; animation: bounceMedal 1s alternate infinite; }
-.victory-stars { font-size: 3rem; margin: 20px 0; color: var(--color-warning); }
-
-/* ==========================================================================
-   BOTONES E INTERFAZ BASE REUTILIZADOS
-   ========================================================================== */
-.btn {
-    font-family: var(--font-game);
-    font-size: 1.6rem;
-    padding: 15px 30px;
-    border: none;
-    border-radius: var(--radius-large);
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-    box-shadow: 0 8px 0px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    color: white;
-    font-weight: bold;
-}
-.btn:active { transform: translateY(4px); box-shadow: 0 4px 0px rgba(0,0,0,0.1); }
+/* BOTONES BASE */
+.btn { font-family: var(--font-game); font-size: 1.5rem; padding: 12px 24px; border: none; border-radius: var(--radius-large); cursor: pointer; box-shadow: 0 6px 0px rgba(0,0,0,0.1); color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; }
+.btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.1); }
 .btn-primary { background-color: var(--color-success); }
 .btn-mode:nth-child(1) { background-color: var(--color-primary); }
 .btn-mode:nth-child(2) { background-color: var(--color-secondary); }
 .btn-mode:nth-child(3) { background-color: var(--color-warning); }
+.btn-circle { width: 52px; height: 52px; border-radius: var(--radius-round); border: 3px solid #E0E0E0; background: white; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #E0E0E0; }
+.btn-circle:active { transform: translateY(2px); box-shadow: 0 2px 0 #E0E0E0; }
 
-.btn-circle {
-    width: 55px;
-    height: 55px;
-    border-radius: var(--radius-round);
-    border: 4px solid #FFF;
-    background-color: #FFF;
-    font-size: 1.6rem;
-    cursor: pointer;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.victory-box { text-align: center; }
+.medal-icon { font-size: 6rem; display: block; animation: floatLogo 1.5s ease-in-out infinite; }
+.victory-stars { font-size: 2.5rem; margin: 15px 0; color: var(--color-warning); }
 
-.footer-controls {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 30px;
-}
-
-/* Componentes de Juego Abiertos */
-.word-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-.syllable-bubble { background: white; padding: 20px 35px; font-size: 2.5rem; border-radius: var(--radius-large); border: 4px solid #E0E0E0; cursor: pointer; box-shadow: 0 8px 0 #E0E0E0; }
-.words-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; }
-.word-card { background: white; padding: 18px; font-size: 2rem; text-align: center; border-radius: var(--radius-large); border: 4px solid #E0E0E0; box-shadow: 0 8px 0 #E0E0E0; cursor: pointer; }
-.floating-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
-.floating-syllable { position: absolute; background: #FFF; padding: 15px 25px; font-size: 2rem; border-radius: 50px; border: 4px solid var(--color-secondary); box-shadow: 0 6px 0 var(--color-secondary); cursor: pointer; }
-
-.hit-success { background-color: var(--color-success) !important; color: white !important; border-color: #55B061 !important; box-shadow: 0 4px 0 #449050 !important; transform: scale(1.08) translateY(4px); }
-.hit-fail { background-color: #FF8A8A !important; color: white !important; border-color: #E06C6C !important; box-shadow: 0 4px 0 #C25353 !important; animation: shake 0.3s ease; }
-.feedback-message { height: 30px; font-size: 1.4rem; color: var(--color-success); font-weight: bold; margin-top: 10px; }
-
-/* Modales */
 .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; }
 .modal-overlay.active { display: flex; }
-.modal-content { background: white; width: 90%; max-width: 460px; padding: 30px; border-radius: var(--radius-large); border: 6px solid var(--color-secondary); box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center; }
-.setting-item { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; font-size: 1.2rem; }
-.setting-item input[type="checkbox"] { width: 30px; height: 30px; }
-.btn-small { background: var(--text-dark); font-size: 1rem; padding: 8px 15px; }
-.btn-danger { background: #E74C3C; font-size: 1.1rem; padding: 10px; width: 100%; }
-.btn-close { background: #7F8C8D; margin-top: 15px; width: 100%; }
-.btn-whatsapp { display: inline-block; margin-top: 8px; background: #25D366; color: white; text-decoration: none; padding: 8px 16px; border-radius: 50px; font-weight: bold; }
+.modal-content { background: white; width: 90%; max-width: 420px; padding: 25px; border-radius: var(--radius-large); text-align: center; border: 5px solid var(--color-secondary); }
+.setting-item { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; font-size: 1.1rem; }
+.setting-item input[type="checkbox"] { width: 25px; height: 25px; }
+.btn-small { background: var(--text-dark); font-size: 0.9rem; padding: 6px 12px; color: white; border: none; border-radius: 8px; }
+.btn-danger { background: #E74C3C; width: 100%; }
+.btn-close { background: #7F8C8D; width: 100%; margin-top: 10px; }
+.btn-whatsapp { display: inline-block; background: #25D366; color: white; text-decoration: none; padding: 6px 15px; border-radius: 50px; font-weight: bold; margin-top: 5px; }
 
 #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; }
-
-/* ==========================================================================
-   ANIMACIONES ADICIONALES
-   ========================================================================== */
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
-@keyframes floatLogo { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(5deg); } }
-@keyframes bounceMedal { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.hidden { display: none !important; }
 .pulse { animation: pulseBtn 1.5s infinite; }
-@keyframes pulseBtn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-@media (max-width: 600px) {
-    .game-title { font-size: 2.8rem; }
-    .worlds-selection-grid { grid-template-columns: repeat(2, 1fr); }
-    .syllable-bubble { font-size: 1.8rem; padding: 15px 25px; }
-}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulseBtn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
