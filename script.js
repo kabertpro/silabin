@@ -155,6 +155,14 @@ class SilabinEngine {
         if (this.currentMode === 3) this.setupMode3(challengeBase);
     }
 
+// INTERRUPTOR PARA VOLVER AL MENÚ PRINCIPAL (AÑADE ESTO):
+    backToMenu() {
+        this.playSystemSound('click');
+        this.clearActiveTimers();
+        this.screens.game.classList.remove('active');
+        this.screens.menu.classList.add('active');
+    }
+
     /* ==========================================================================
        MECÁNICAS REESCRITAS
        ========================================================================== */
