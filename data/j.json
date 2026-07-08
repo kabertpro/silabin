@@ -1,0 +1,147 @@
+{
+  "consonante": "J",
+  "titulo": "Sílabas con J",
+  "silabas": [
+    {
+      "silaba": "JA",
+      "palabras": [
+        [
+          "JA",
+          "BÓN"
+        ],
+        [
+          "JA",
+          "RRA"
+        ],
+        [
+          "JAR",
+          "DÍN"
+        ],
+        [
+          "JAU",
+          "LA"
+        ],
+        [
+          "JA",
+          "LE",
+          "A"
+        ],
+        [
+          "JA",
+          "GUAR"
+        ],
+        [
+          "JA",
+          "MÓN"
+        ],
+        [
+          "JA",
+          "RA",
+          "BE"
+        ]
+      ]
+    },
+    {
+      "silaba": "JE",
+      "palabras": [
+        [
+          "JE",
+          "FE"
+        ],
+        [
+          "JE",
+          "RIN",
+          "GA"
+        ],
+        [
+          "JER",
+          "SEY"
+        ],
+        [
+          "JEN",
+          "GI",
+          "BRE"
+        ]
+      ]
+    },
+    {
+      "silaba": "JI",
+      "palabras": [
+        [
+          "JI",
+          "RA",
+          "FA"
+        ],
+        [
+          "JI",
+          "NE",
+          "TE"
+        ]
+      ]
+    },
+    {
+      "silaba": "JO",
+      "palabras": [
+        [
+          "JO",
+          "YA"
+        ],
+        [
+          "JO",
+          "VEN"
+        ],
+        [
+          "JOR",
+          "NA",
+          "DA"
+        ],
+        [
+          "JO",
+          "RO",
+          "BA"
+        ],
+        [
+          "JO",
+          "TA"
+        ]
+      ]
+    },
+    {
+      "silaba": "JU",
+      "palabras": [
+        [
+          "JUE",
+          "GO"
+        ],
+        [
+          "JU",
+          "GO"
+        ],
+        [
+          "JU",
+          "GUE",
+          "TE"
+        ],
+        [
+          "JUEZ"
+        ],
+        [
+          "JUN",
+          "GLA"
+        ],
+        [
+          "JUN",
+          "TO"
+        ],
+        [
+          "JU",
+          "LIO"
+        ],
+        [
+          "JUS",
+          "TO"
+        ]
+      ]
+    }
+  ]
+}

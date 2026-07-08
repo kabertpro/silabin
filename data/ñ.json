@@ -1,0 +1,40 @@
+{
+  "consonante": "Ñ",
+  "titulo": "Sílabas con Ñ",
+  "silabas": [
+    {
+      "silaba": "ÑA",
+      "palabras": [
+        [
+          "ÑA",
+          "ME"
+        ],
+        [
+          "ÑA",
+          "TO"
+        ]
+      ]
+    },
+    {
+      "silaba": "ÑO",
+      "palabras": [
+        [
+          "ÑO",
+          "ÑO"
+        ],
+        [
+          "ÑO",
+          "QUI"
+        ]
+      ]
+    },
+    {
+      "silaba": "ÑU",
+      "palabras": [
+        [
+          "ÑU"
+        ]
+      ]
+    }
+  ]
+}

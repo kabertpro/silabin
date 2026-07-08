@@ -1,0 +1,50 @@
+{
+  "consonante": "Q",
+  "titulo": "Sílabas con Q",
+  "silabas": [
+    {
+      "silaba": "QUE",
+      "palabras": [
+        [
+          "QUE",
+          "SO"
+        ],
+        [
+          "QUE",
+          "RI",
+          "DO"
+        ],
+        [
+          "QUE",
+          "JA"
+        ],
+        [
+          "QUET",
+          "ZAL"
+        ]
+      ]
+    },
+    {
+      "silaba": "QUI",
+      "palabras": [
+        [
+          "QUIN",
+          "CE"
+        ],
+        [
+          "QUIE",
+          "TO"
+        ],
+        [
+          "QUÍ",
+          "MI",
+          "CA"
+        ],
+        [
+          "QUIOS",
+          "CO"
+        ]
+      ]
+    }
+  ]
+}

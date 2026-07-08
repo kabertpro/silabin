@@ -1,0 +1,68 @@
+{
+  "consonante": "LL",
+  "titulo": "Sílabas con LL",
+  "silabas": [
+    {
+      "silaba": "LLA",
+      "palabras": [
+        [
+          "LLA",
+          "VE"
+        ],
+        [
+          "LLA",
+          "MA"
+        ],
+        [
+          "LLAN",
+          "TA"
+        ],
+        [
+          "LLA",
+          "NU",
+          "RA"
+        ]
+      ]
+    },
+    {
+      "silaba": "LLE",
+      "palabras": [
+        [
+          "LLE",
+          "GA",
+          "DA"
+        ],
+        [
+          "LLE",
+          "NO"
+        ]
+      ]
+    },
+    {
+      "silaba": "LLO",
+      "palabras": [
+        [
+          "LLO",
+          "VER"
+        ],
+        [
+          "LLO",
+          "RAR"
+        ],
+        [
+          "LLO",
+          "RÓN"
+        ]
+      ]
+    },
+    {
+      "silaba": "LLU",
+      "palabras": [
+        [
+          "LLU",
+          "VIA"
+        ]
+      ]
+    }
+  ]
+}

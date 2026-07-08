@@ -1,0 +1,126 @@
+{
+  "consonante": "CH",
+  "titulo": "Sílabas con CH",
+  "silabas": [
+    {
+      "silaba": "CHA",
+      "palabras": [
+        [
+          "CHA",
+          "LE",
+          "CO"
+        ],
+        [
+          "CHAN",
+          "CHO"
+        ],
+        [
+          "CHA",
+          "QUE",
+          "TA"
+        ],
+        [
+          "CHA",
+          "PA"
+        ],
+        [
+          "CHA",
+          "RRO"
+        ],
+        [
+          "CHA",
+          "RO",
+          "LA"
+        ],
+        [
+          "CHAN",
+          "CLA"
+        ]
+      ]
+    },
+    {
+      "silaba": "CHE",
+      "palabras": [
+        [
+          "CHE",
+          "QUE"
+        ],
+        [
+          "CHEF"
+        ]
+      ]
+    },
+    {
+      "silaba": "CHI",
+      "palabras": [
+        [
+          "CHI",
+          "LE"
+        ],
+        [
+          "CHIS",
+          "TE"
+        ],
+        [
+          "CHI",
+          "CO"
+        ],
+        [
+          "CHI",
+          "VO"
+        ],
+        [
+          "CHI",
+          "QUI",
+          "TO"
+        ]
+      ]
+    },
+    {
+      "silaba": "CHO",
+      "palabras": [
+        [
+          "CHO",
+          "CO",
+          "LA",
+          "TE"
+        ],
+        [
+          "CHO",
+          "RRO"
+        ],
+        [
+          "CHO",
+          "ZA"
+        ],
+        [
+          "CHO",
+          "QUE"
+        ]
+      ]
+    },
+    {
+      "silaba": "CHU",
+      "palabras": [
+        [
+          "CHU",
+          "PE",
+          "TE"
+        ],
+        [
+          "CHU",
+          "LE",
+          "TA"
+        ],
+        [
+          "CHU",
+          "RRO"
+        ],
+        [
+          "CHU",
+          "ZO"
+        ]
+      ]
+    }
+  ]
+}

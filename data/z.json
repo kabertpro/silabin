@@ -1,0 +1,88 @@
+{
+  "consonante": "Z",
+  "titulo": "Sílabas con Z",
+  "silabas": [
+    {
+      "silaba": "ZA",
+      "palabras": [
+        [
+          "ZA",
+          "PA",
+          "TO"
+        ],
+        [
+          "ZA",
+          "NA",
+          "HO",
+          "RIA"
+        ],
+        [
+          "ZAN",
+          "CU",
+          "DO"
+        ],
+        [
+          "ZA",
+          "FI",
+          "RO"
+        ]
+      ]
+    },
+    {
+      "silaba": "ZE",
+      "palabras": [
+        [
+          "ZE",
+          "TA"
+        ]
+      ]
+    },
+    {
+      "silaba": "ZI",
+      "palabras": [
+        [
+          "ZIG",
+          "ZAG"
+        ]
+      ]
+    },
+    {
+      "silaba": "ZO",
+      "palabras": [
+        [
+          "ZO",
+          "RRO"
+        ],
+        [
+          "ZO",
+          "O",
+          "LÓ",
+          "GI",
+          "CO"
+        ],
+        [
+          "ZO",
+          "NA"
+        ]
+      ]
+    },
+    {
+      "silaba": "ZU",
+      "palabras": [
+        [
+          "ZUM",
+          "BI",
+          "DO"
+        ],
+        [
+          "ZUR",
+          "DO"
+        ],
+        [
+          "ZUE",
+          "CO"
+        ]
+      ]
+    }
+  ]
+}

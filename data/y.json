@@ -1,0 +1,75 @@
+{
+  "consonante": "Y",
+  "titulo": "Sílabas con Y",
+  "silabas": [
+    {
+      "silaba": "YA",
+      "palabras": [
+        [
+          "YA",
+          "TE"
+        ],
+        [
+          "YA",
+          "CA",
+          "RÉ"
+        ]
+      ]
+    },
+    {
+      "silaba": "YE",
+      "palabras": [
+        [
+          "YE",
+          "GUA"
+        ],
+        [
+          "YEL",
+          "MO"
+        ],
+        [
+          "YE",
+          "MA"
+        ],
+        [
+          "YE",
+          "SO"
+        ]
+      ]
+    },
+    {
+      "silaba": "YO",
+      "palabras": [
+        [
+          "YO",
+          "GUR"
+        ],
+        [
+          "YO",
+          "YO"
+        ],
+        [
+          "YO",
+          "DO"
+        ]
+      ]
+    },
+    {
+      "silaba": "YU",
+      "palabras": [
+        [
+          "YU",
+          "CA"
+        ],
+        [
+          "YUN",
+          "QUE"
+        ],
+        [
+          "YU",
+          "GO"
+        ]
+      ]
+    }
+  ]
+}

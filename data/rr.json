@@ -1,0 +1,99 @@
+{
+  "consonante": "RR",
+  "titulo": "Sílabas con RR",
+  "silabas": [
+    {
+      "silaba": "RRA",
+      "palabras": [
+        [
+          "GA",
+          "RRA"
+        ],
+        [
+          "TIE",
+          "RRA"
+        ],
+        [
+          "GUI",
+          "TA",
+          "RRA"
+        ],
+        [
+          "CI",
+          "GA",
+          "RRA"
+        ]
+      ]
+    },
+    {
+      "silaba": "RRE",
+      "palabras": [
+        [
+          "CO",
+          "RRE",
+          "O"
+        ],
+        [
+          "TO",
+          "RRE"
+        ],
+        [
+          "CA",
+          "RRE",
+          "TA"
+        ],
+        [
+          "PE",
+          "RRE",
+          "RA"
+        ]
+      ]
+    },
+    {
+      "silaba": "RRI",
+      "palabras": [
+        [
+          "GO",
+          "RRIÓN"
+        ],
+        [
+          "CHO",
+          "RRI",
+          "TO"
+        ],
+        [
+          "A",
+          "BU",
+          "RRI",
+          "DO"
+        ]
+      ]
+    },
+    {
+      "silaba": "RRO",
+      "palabras": [
+        [
+          "PE",
+          "RRO"
+        ],
+        [
+          "CA",
+          "RRO"
+        ],
+        [
+          "BU",
+          "RRO"
+        ],
+        [
+          "GO",
+          "RRO"
+        ],
+        [
+          "CA",
+          "CHO",
+          "RRO"
+        ]
+      ]
+    }
+  ]
+}

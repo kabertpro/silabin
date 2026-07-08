@@ -1,0 +1,52 @@
+{
+  "consonante": "K",
+  "titulo": "Sílabas con K",
+  "silabas": [
+    {
+      "silaba": "KA",
+      "palabras": [
+        [
+          "KA",
+          "RA",
+          "TE"
+        ],
+        [
+          "KA",
+          "YAK"
+        ],
+        [
+          "KAN",
+          "GU",
+          "RO"
+        ]
+      ]
+    },
+    {
+      "silaba": "KI",
+      "palabras": [
+        [
+          "KI",
+          "LO"
+        ],
+        [
+          "KI",
+          "WI"
+        ],
+        [
+          "KIOS",
+          "CO"
+        ]
+      ]
+    },
+    {
+      "silaba": "KO",
+      "palabras": [
+        [
+          "KO",
+          "A",
+          "LA"
+        ]
+      ]
+    }
+  ]
+}

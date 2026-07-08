@@ -1,0 +1,24 @@
+{
+  "consonante": "W",
+  "titulo": "Sílabas con W",
+  "silabas": [
+    {
+      "silaba": "WA",
+      "palabras": [
+        [
+          "WA",
+          "FLE"
+        ]
+      ]
+    },
+    {
+      "silaba": "WI",
+      "palabras": [
+        [
+          "WI",
+          "FI"
+        ]
+      ]
+    }
+  ]
+}
