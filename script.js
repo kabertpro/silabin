@@ -196,20 +196,80 @@ class SilabinEngine {
             // Si el servidor falla, mantiene ["vocales", "m", "p"] definidos arriba.
         }
 
-        // Construcción segura del grid de botones
+        // Construcción organizada por criterio pedagógico (ver buildWorldCategories)
         const container = document.getElementById('worlds-grid-container');
         container.innerHTML = "";
 
-        this.availableWorlds.forEach(worldKey => {
-            const button = document.createElement('button');
-            button.className = 'btn-world';
-            button.innerText = worldKey.toUpperCase();
-            button.addEventListener('click', () => this.loadWorldData(worldKey));
-            container.appendChild(button);
+        const categories = this.buildWorldCategories(this.availableWorlds);
+
+        categories.forEach(cat => {
+            const section = document.createElement('div');
+            section.className = 'world-category';
+
+            const title = document.createElement('h3');
+            title.className = 'world-category-title';
+            title.innerText = cat.label;
+            section.appendChild(title);
+
+            const row = document.createElement('div');
+            row.className = 'world-row';
+
+            cat.keys.forEach(worldKey => {
+                const button = document.createElement('button');
+                button.className = 'btn-world';
+                button.innerText = worldKey.toUpperCase();
+                button.addEventListener('click', () => this.loadWorldData(worldKey));
+                row.appendChild(button);
+            });
+
+            section.appendChild(row);
+            container.appendChild(section);
         });
 
         this.playAudioFile('vamos_a_jugar.mp3');
         this.changeScreen('worlds');
+    }
+
+    /**
+     * Agrupa las letras/dígrafos disponibles (data/index.json) siguiendo una
+     * progresión pedagógica típica de lectoescritura en español para niños de 4-7 años:
+     * 1) Vocales
+     * 2) Consonantes continuas / muy frecuentes, fáciles de pronunciar y de trazar
+     * 3) Consonantes intermedias, un poco más de complejidad articulatoria
+     * 4) Consonantes con reglas ortográficas (c/g/r según la vocal que sigue)
+     * 5) Dígrafos y combinaciones especiales
+     * 6) Letras de uso poco frecuente o articulación más difícil
+     * Cualquier clave de index.json que no encaje en el mapa cae en "Más letras",
+     * respetando el orden en que llegó desde el archivo.
+     */
+    buildWorldCategories(worldKeys) {
+        const pedagogicalMap = [
+            { label: "🔤 Vocales", keys: ["vocales", "a", "e", "i", "o", "u"] },
+            { label: "🌱 Primeras letras", keys: ["m", "p", "s", "l", "t"] },
+            { label: "🌼 Letras intermedias", keys: ["n", "d", "f", "b", "v"] },
+            { label: "🌳 Letras con reglas", keys: ["c", "g", "r", "j"] },
+            { label: "✨ Combinaciones especiales", keys: ["ch", "ll", "rr", "qu", "gu", "ñ"] },
+            { label: "🚀 Letras menos frecuentes", keys: ["h", "x", "w", "k", "y", "z"] }
+        ];
+
+        const availableSet = new Set(worldKeys.map(k => k.toLowerCase()));
+        const used = new Set();
+        const categories = [];
+
+        pedagogicalMap.forEach(group => {
+            const keysPresent = group.keys.filter(k => availableSet.has(k) && !used.has(k));
+            if (keysPresent.length > 0) {
+                keysPresent.forEach(k => used.add(k));
+                categories.push({ label: group.label, keys: keysPresent });
+            }
+        });
+
+        const remaining = worldKeys.filter(k => !used.has(k.toLowerCase()));
+        if (remaining.length > 0) {
+            categories.push({ label: "📚 Más letras", keys: remaining });
+        }
+
+        return categories;
     }
 
     async loadWorldData(worldKey) {
