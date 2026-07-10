@@ -17,6 +17,7 @@ class SilabinEngine {
         // Lista interna por defecto en caso de que falle index.json de forma externa
         this.availableWorlds = ["vocales", "m", "p"];
         this.loadedDictionary = [];
+        this.currentWorldKey = null;
         this.lastWordId = null;
         this.animationFrameIds = [];
 
@@ -104,7 +105,6 @@ class SilabinEngine {
     registerEvents() {
         document.getElementById('btn-splash-start').addEventListener('click', () => {
             this.playSystemSound('click');
-            this.requestFullscreenAndLockPortrait();
             this.screens.splash.classList.remove('active');
             this.loadProfileFromDevice();
             if (!this.playerName) {
@@ -144,6 +144,12 @@ class SilabinEngine {
 
         document.getElementById('btn-fullscreen').addEventListener('click', () => this.toggleFullscreen());
         document.getElementById('btn-reset').addEventListener('click', () => this.resetEverything());
+
+        document.getElementById('btn-victory-continue').addEventListener('click', () => this.continueSameWorld());
+        document.getElementById('btn-victory-home').addEventListener('click', () => {
+            this.playSystemSound('click');
+            this.changeScreen('menu');
+        });
     }
 
     loadProfileFromDevice() {
@@ -196,80 +202,20 @@ class SilabinEngine {
             // Si el servidor falla, mantiene ["vocales", "m", "p"] definidos arriba.
         }
 
-        // Construcción organizada por criterio pedagógico (ver buildWorldCategories)
+        // Construcción segura del grid de botones
         const container = document.getElementById('worlds-grid-container');
         container.innerHTML = "";
 
-        const categories = this.buildWorldCategories(this.availableWorlds);
-
-        categories.forEach(cat => {
-            const section = document.createElement('div');
-            section.className = 'world-category';
-
-            const title = document.createElement('h3');
-            title.className = 'world-category-title';
-            title.innerText = cat.label;
-            section.appendChild(title);
-
-            const row = document.createElement('div');
-            row.className = 'world-row';
-
-            cat.keys.forEach(worldKey => {
-                const button = document.createElement('button');
-                button.className = 'btn-world';
-                button.innerText = worldKey.toUpperCase();
-                button.addEventListener('click', () => this.loadWorldData(worldKey));
-                row.appendChild(button);
-            });
-
-            section.appendChild(row);
-            container.appendChild(section);
+        this.availableWorlds.forEach(worldKey => {
+            const button = document.createElement('button');
+            button.className = 'btn-world';
+            button.innerText = worldKey.toUpperCase();
+            button.addEventListener('click', () => this.loadWorldData(worldKey));
+            container.appendChild(button);
         });
 
         this.playAudioFile('vamos_a_jugar.mp3');
         this.changeScreen('worlds');
-    }
-
-    /**
-     * Agrupa las letras/dígrafos disponibles (data/index.json) siguiendo una
-     * progresión pedagógica típica de lectoescritura en español para niños de 4-7 años:
-     * 1) Vocales
-     * 2) Consonantes continuas / muy frecuentes, fáciles de pronunciar y de trazar
-     * 3) Consonantes intermedias, un poco más de complejidad articulatoria
-     * 4) Consonantes con reglas ortográficas (c/g/r según la vocal que sigue)
-     * 5) Dígrafos y combinaciones especiales
-     * 6) Letras de uso poco frecuente o articulación más difícil
-     * Cualquier clave de index.json que no encaje en el mapa cae en "Más letras",
-     * respetando el orden en que llegó desde el archivo.
-     */
-    buildWorldCategories(worldKeys) {
-        const pedagogicalMap = [
-            { label: "🔤 Vocales", keys: ["vocales", "a", "e", "i", "o", "u"] },
-            { label: "🌱 Primeras letras", keys: ["m", "p", "s", "l", "t"] },
-            { label: "🌼 Letras intermedias", keys: ["n", "d", "f", "b", "v"] },
-            { label: "🌳 Letras con reglas", keys: ["c", "g", "r", "j"] },
-            { label: "✨ Combinaciones especiales", keys: ["ch", "ll", "rr", "qu", "gu", "ñ"] },
-            { label: "🚀 Letras menos frecuentes", keys: ["h", "x", "w", "k", "y", "z"] }
-        ];
-
-        const availableSet = new Set(worldKeys.map(k => k.toLowerCase()));
-        const used = new Set();
-        const categories = [];
-
-        pedagogicalMap.forEach(group => {
-            const keysPresent = group.keys.filter(k => availableSet.has(k) && !used.has(k));
-            if (keysPresent.length > 0) {
-                keysPresent.forEach(k => used.add(k));
-                categories.push({ label: group.label, keys: keysPresent });
-            }
-        });
-
-        const remaining = worldKeys.filter(k => !used.has(k.toLowerCase()));
-        if (remaining.length > 0) {
-            categories.push({ label: "📚 Más letras", keys: remaining });
-        }
-
-        return categories;
     }
 
     async loadWorldData(worldKey) {
@@ -279,6 +225,7 @@ class SilabinEngine {
             if (!response.ok) throw new Error();
             const worldData = await response.json();
 
+            this.currentWorldKey = worldKey;
             this.buildWorkingDictionary(worldData);
             this.currentRound = 0;
             this.updateProgressBar();
@@ -312,8 +259,21 @@ class SilabinEngine {
         this.clearActiveTimers();
         this.playground.innerHTML = "";
 
-        let validOptions = this.loadedDictionary.filter(item => item.id !== this.lastWordId);
-        if (validOptions.length === 0) validOptions = this.loadedDictionary;
+        // El Modo 1 compara la burbuja tocada contra la sílaba exacta (challenge.target).
+        // Palabras cuya primera sílaba real es trabada o lleva diptongo (PAN, PASTEL, AUTO...)
+        // nunca coinciden con la sílaba simple del grupo, así que las excluimos SOLO en este modo.
+        // Modo 2 y Modo 3 no tienen este problema porque comparan palabras completas o
+        // solo el nombre de la sílaba (challenge.target), no la burbuja literal.
+        let pool = this.loadedDictionary;
+        if (this.currentMode === 1) {
+            const compatible = this.loadedDictionary.filter(item =>
+                item.syllablesArray[0].toUpperCase() === item.target.toUpperCase()
+            );
+            pool = compatible.length > 0 ? compatible : this.loadedDictionary;
+        }
+
+        let validOptions = pool.filter(item => item.id !== this.lastWordId);
+        if (validOptions.length === 0) validOptions = pool;
 
         const challengeBase = validOptions[Math.floor(Math.random() * validOptions.length)];
         this.lastWordId = challengeBase.id;
@@ -328,7 +288,10 @@ class SilabinEngine {
     setupMode1(challenge) {
         const container = document.createElement('div');
         container.className = 'word-container';
-        challenge.syllablesArray.forEach((syllable) => {
+        // Barajamos el orden: antes la sílaba correcta siempre venía primero en el JSON,
+        // haciendo el juego predecible (siempre la primera opción).
+        const shuffledSyllables = this.shuffleArray([...challenge.syllablesArray]);
+        shuffledSyllables.forEach((syllable) => {
             const bubble = document.createElement('div');
             bubble.className = 'syllable-bubble';
             bubble.innerText = syllable.toUpperCase();
@@ -349,18 +312,32 @@ class SilabinEngine {
         decoys = this.shuffleArray([...decoys]);
 
         const options = [
-            { text: challenge.fullWordString, correct: true },
-            { text: decoys[0]?.fullWordString || "SOL", correct: false },
-            { text: decoys[1]?.fullWordString || "OSO", correct: false }
+            { syllablesArray: challenge.syllablesArray, correct: true },
+            { syllablesArray: decoys[0]?.syllablesArray || ["SOL"], correct: false },
+            { syllablesArray: decoys[1]?.syllablesArray || ["OSO"], correct: false }
         ];
 
         this.shuffleArray(options).forEach(opt => {
             const card = document.createElement('div');
             card.className = 'word-card';
-            card.innerText = opt.text.toUpperCase();
+
+            // Construimos la palabra sílaba por sílaba (en vez de un solo texto plano)
+            // para poder resaltar la primera sílaba como refuerzo visual al acertar.
+            opt.syllablesArray.forEach((syl, index) => {
+                const span = document.createElement('span');
+                span.innerText = syl.toUpperCase();
+                span.dataset.index = index;
+                card.appendChild(span);
+            });
+
             card.addEventListener('click', () => {
-                if (opt.correct) this.handleOutcome(card, true);
-                else this.handleOutcome(card, false);
+                if (opt.correct) {
+                    const firstSyllableSpan = card.querySelector('span[data-index="0"]');
+                    if (firstSyllableSpan) firstSyllableSpan.classList.add('syl-highlight');
+                    this.handleOutcome(card, true);
+                } else {
+                    this.handleOutcome(card, false);
+                }
             });
             grid.appendChild(card);
         });
@@ -465,6 +442,15 @@ class SilabinEngine {
         for (let i = 0; i < 3; i++) { setTimeout(() => this.triggerConfetti(), i * 500); }
     }
 
+    continueSameWorld() {
+        this.playSystemSound('click');
+        this.currentRound = 0;
+        this.updateProgressBar();
+        this.changeScreen('game');
+        this.playModeIntroAudio(this.currentMode);
+        this.generateChallenge();
+    }
+
     updateProgressBar() {
         const percentage = (this.currentRound / this.maxRoundsPerLevel) * 100;
         this.progressBarFill.style.width = `${percentage}%`;
@@ -540,24 +526,6 @@ class SilabinEngine {
     toggleFullscreen() {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen().then(() => document.getElementById('btn-fullscreen').innerText = "Desactivar").catch(() => {});
         else { document.exitFullscreen(); document.getElementById('btn-fullscreen').innerText = "Activar"; }
-    }
-
-    // En celulares y tablets forzamos pantalla completa + orientación vertical.
-    // En escritorio (puntero fino) no se activa, para respetar la ventana del usuario.
-    isTouchDevice() {
-        return window.matchMedia('(pointer: coarse)').matches;
-    }
-
-    requestFullscreenAndLockPortrait() {
-        if (!this.isTouchDevice()) return;
-        const el = document.documentElement;
-        const goFullscreen = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-        if (goFullscreen && !document.fullscreenElement) {
-            goFullscreen.call(el).catch(() => {});
-        }
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('portrait').catch(() => {});
-        }
     }
 
     resetEverything() { localStorage.clear(); alert("Reiniciado."); window.location.reload(); }
